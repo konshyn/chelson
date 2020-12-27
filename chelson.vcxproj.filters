@@ -2,5 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\RendererDirectX12.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Application.hpp" />
+    <ClInclude Include="src\Subsystem.hpp" />
+    <ClInclude Include="src\WindowsIncludes.hpp" />
+    <ClInclude Include="src\Helpers.hpp" />
+    <ClInclude Include="src\Renderer.hpp" />
+    <ClInclude Include="src\d3dx12.h" />
   </ItemGroup>
 </Project>

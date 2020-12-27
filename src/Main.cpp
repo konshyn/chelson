@@ -1,8 +1,25 @@
-#include <iostream>
+#include "Application.hpp"
 
-int main()
+int WINAPI wWinMain(
+    _In_ HINSTANCE hInstance,
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
-    std::cout << "Hello, chelson!\n";
+    UNREFERENCED_PARAMETER(hPrevInstance);
+    UNREFERENCED_PARAMETER(lpCmdLine);
 
-    return 0;
+    Application &app = Application::Instance();
+
+    bool res = app.Initialize(hInstance);
+
+    if (!res) {
+        return S_FALSE;
+    }
+
+    app.Run();
+
+    app.Finitialize();
+
+    return S_OK;
 }
