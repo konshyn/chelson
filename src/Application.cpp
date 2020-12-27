@@ -90,9 +90,9 @@ void Application::KeyDownEvent(WPARAM wParam)
     case 'V':
         renderer::ToggleVSync();
         break;
-    //case 'T':
-    //    renderer::ToggleTearing();
-    //    break;
+    case 'T':
+        renderer::ToggleTearing();
+        break;
     case 'F': 
         renderer::ToggleFullscreen(); 
         break;
@@ -130,7 +130,7 @@ bool Application::Initialize(HINSTANCE hInstance)
     CreateWindow(hInstance);
     assert(m_hwnd && "Failed to create window");
 
-    renderer::Initialize(m_hwnd, false);
+    renderer::Initialize(m_hwnd, true);
 
     m_isInitialize = result;
 

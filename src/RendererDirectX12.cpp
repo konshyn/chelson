@@ -447,6 +447,10 @@ namespace renderer
         SetFullscreen(!g_Fullscreen);
     }
 
+    void ToggleTearing()
+    {
+        g_TearingSupported = !g_TearingSupported;
+    }
 
     void Render()
     {

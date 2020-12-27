@@ -13,9 +13,13 @@ namespace renderer
     void SetVSync(bool vsync);
     bool IsVSync();
     void ToggleVSync();
+
     void SetFullscreen(bool fullscreen);
     bool IsFullscreen();
     void ToggleFullscreen();
+
+    void ToggleTearing();
+
     void RequestExit();
     void Render();
 }
