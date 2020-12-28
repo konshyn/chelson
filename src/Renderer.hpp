@@ -23,3 +23,4 @@ namespace renderer
     void RequestExit();
     void Render();
 }
+

@@ -4,6 +4,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\RendererDirectX12.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.hpp" />
@@ -12,5 +13,9 @@
     <ClInclude Include="src\Helpers.hpp" />
     <ClInclude Include="src\Renderer.hpp" />
     <ClInclude Include="src\d3dx12.h" />
+    <ClInclude Include="src\Camera.hpp" />
+    <ClInclude Include="src\Mesh.hpp" />
+    <ClInclude Include="src\Scene.hpp" />
+    <ClInclude Include="src\Math.hpp" />
   </ItemGroup>
 </Project>
