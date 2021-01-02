@@ -4,6 +4,7 @@
 
 #include "WindowsIncludes.hpp"
 
+struct Scene;
 namespace renderer
 {
     void Initialize(HWND hwnd, bool enableDebugLayer = false);
@@ -21,6 +22,6 @@ namespace renderer
     void ToggleTearing();
 
     void RequestExit();
-    void Render();
+    void Render(Scene *scene);
 }
 

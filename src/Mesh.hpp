@@ -5,5 +5,15 @@
 
 struct Mesh
 {
-    std::vector<Vec3f> vertices;
+    std::vector<DirectX::XMFLOAT3> vertices;
 };
+
+//struct MeshSoA
+//{
+//    std::vector<DirectX::XMFLOAT3> vertices;
+//};
+//
+//struct MeshAoS
+//{
+//    std::vector<DirectX::XMFLOAT3> vertices;
+//};

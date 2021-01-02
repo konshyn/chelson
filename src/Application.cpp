@@ -131,6 +131,7 @@ bool Application::Initialize(HINSTANCE hInstance)
     assert(m_hwnd && "Failed to create window");
 
     renderer::Initialize(m_hwnd, true);
+    FillTriangleScene(scene);
 
     m_isInitialize = result;
 
@@ -156,7 +157,7 @@ void Application::Run()
         }
 
         Update();
-        renderer::Render();
+        renderer::Render(&scene);
     }
 
     renderer::RequestExit();

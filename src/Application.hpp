@@ -3,6 +3,8 @@
 #include "WindowsIncludes.hpp"
 #include <cstdint>
 
+#include "Scene.hpp"
+
 class Application
 {
 // public API
@@ -20,6 +22,8 @@ private:
 
     uint32_t m_windowWidth{};
     uint32_t m_windowHeight{};
+
+    Scene scene;
 
 public:
     Application(const Application &) = delete;
