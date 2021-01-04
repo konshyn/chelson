@@ -17,6 +17,8 @@
     <ClCompile Include="external\DirectXMath\Stereo3DMatrixHelper.cpp">
       <Filter>DirectXMath</Filter>
     </ClCompile>
+    <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\ResourceLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.hpp" />
@@ -74,6 +76,9 @@
     <ClInclude Include="external\DirectXMath\XDSP.h">
       <Filter>DirectXMath</Filter>
     </ClInclude>
+    <ClInclude Include="src\ResourceLoader.hpp" />
+    <ClInclude Include="src\ResourceRefsStorage.hpp" />
+    <ClInclude Include="src\C++STL.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="DirectXMath">
