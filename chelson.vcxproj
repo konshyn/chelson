@@ -91,15 +91,14 @@
     <ClCompile Include="external\DirectXMath\DirectXSHD3D12.cpp" />
     <ClCompile Include="external\DirectXMath\Stereo3DMatrixHelper.cpp" />
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\AssetLoader\PreparedMeshLoader.cpp" />
-    <ClCompile Include="src\AssetLoader\PreparedSceneLoader.cpp" />
-    <ClCompile Include="src\DirectX12_Impl\D3D12StuffCreator.cpp" />
-    <ClCompile Include="src\DirectX12_Impl\GraphicsDirectX12.cpp" />
-    <ClCompile Include="src\DirectX12_Impl\GraphicsResourceLoader.cpp" />
-    <ClCompile Include="src\DirectX12_Impl\GraphicsSwapChain.cpp" />
-    <ClCompile Include="src\DirectX12_Impl\Renderer.cpp" />
+    <ClCompile Include="src\GAPI\dx12\DirectX12.cpp" />
+    <ClCompile Include="src\GAPI\dx12\Renderer.cpp" />
+    <ClCompile Include="src\GAPI\dx12\ResourceLoader.cpp" />
+    <ClCompile Include="src\GAPI\dx12\StuffCreator.cpp" />
+    <ClCompile Include="src\GAPI\dx12\SwapChain.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Render\Techniques\LambertianReflectance.cpp" />
+    <ClCompile Include="src\Scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\DirectXMath\DirectXCollision.h" />
@@ -118,19 +117,17 @@
     <ClInclude Include="external\DirectXMath\Stereo3DMatrixHelper.h" />
     <ClInclude Include="external\DirectXMath\XDSP.h" />
     <ClInclude Include="src\Application.hpp" />
-    <ClInclude Include="src\AssetLoaderAPI.hpp" />
-    <ClInclude Include="src\AssetLoader\AssetTypes.hpp" />
-    <ClInclude Include="src\BulkDataContainer.hpp" />
-    <ClInclude Include="src\Camera.hpp" />
-    <ClInclude Include="src\DirectX12_Impl\D3D12StuffCreator.hpp" />
-    <ClInclude Include="src\DirectX12_Impl\d3dx12.h" />
-    <ClInclude Include="src\DirectX12_Impl\GraphicsCommonStuff.hpp" />
-    <ClInclude Include="src\GraphicsVertexTypes.hpp" />
+    <ClInclude Include="src\AssetLoader.hpp" />
+    <ClInclude Include="src\GAPI\dx12\CommonStuff.hpp" />
+    <ClInclude Include="src\GAPI\dx12\d3dx12.h" />
+    <ClInclude Include="src\GAPI\dx12\StuffCreator.hpp" />
+    <ClInclude Include="src\GraphicsInterlayer.hpp" />
     <ClInclude Include="src\Helpers.hpp" />
-    <ClInclude Include="src\Math.hpp" />
-    <ClInclude Include="src\GraphicsAPI.hpp" />
+    <ClInclude Include="src\Mathematics\Mathematics.hpp" />
+    <ClInclude Include="src\Render.hpp" />
+    <ClInclude Include="src\Render\Render.cpp" />
     <ClInclude Include="src\Scene.hpp" />
-    <ClInclude Include="src\Subsystem.hpp" />
+    <ClInclude Include="src\Scene\Camera.hpp" />
     <ClInclude Include="src\WindowsIncludes.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -142,13 +139,7 @@
     <None Include="external\DirectXMath\DirectXPackedVector.inl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\flat_color.frag.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\shaders\flat_color.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\shaders\flat_color.vert.hlsl">
+    <None Include="src\GAPI\dx12\Shaders\flat_color.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

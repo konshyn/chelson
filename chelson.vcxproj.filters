@@ -1,157 +1,173 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="external\DirectXMath\DirectXSH.cpp">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClCompile>
     <ClCompile Include="external\DirectXMath\DirectXSHD3D11.cpp">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClCompile>
     <ClCompile Include="external\DirectXMath\DirectXSHD3D12.cpp">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClCompile>
     <ClCompile Include="external\DirectXMath\Stereo3DMatrixHelper.cpp">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClCompile>
-    <ClCompile Include="src\DirectX12_Impl\GraphicsDirectX12.cpp">
-      <Filter>DirectX12_Impl</Filter>
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\GAPI\dx12\DirectX12.cpp">
+      <Filter>GAPI\dx12</Filter>
     </ClCompile>
-    <ClCompile Include="src\DirectX12_Impl\GraphicsResourceLoader.cpp">
-      <Filter>DirectX12_Impl</Filter>
+    <ClCompile Include="src\GAPI\dx12\Renderer.cpp">
+      <Filter>GAPI\dx12</Filter>
     </ClCompile>
-    <ClCompile Include="src\AssetLoader\PreparedMeshLoader.cpp">
-      <Filter>AssetLoader</Filter>
+    <ClCompile Include="src\GAPI\dx12\ResourceLoader.cpp">
+      <Filter>GAPI\dx12</Filter>
     </ClCompile>
-    <ClCompile Include="src\AssetLoader\PreparedSceneLoader.cpp">
-      <Filter>AssetLoader</Filter>
+    <ClCompile Include="src\GAPI\dx12\StuffCreator.cpp">
+      <Filter>GAPI\dx12</Filter>
     </ClCompile>
-    <ClCompile Include="src\DirectX12_Impl\GraphicsSwapChain.cpp">
-      <Filter>DirectX12_Impl</Filter>
+    <ClCompile Include="src\GAPI\dx12\SwapChain.cpp">
+      <Filter>GAPI\dx12</Filter>
     </ClCompile>
-    <ClCompile Include="src\DirectX12_Impl\Renderer.cpp">
-      <Filter>DirectX12_Impl</Filter>
+    <ClCompile Include="src\Scene\Scene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\DirectX12_Impl\D3D12StuffCreator.cpp">
-      <Filter>DirectX12_Impl</Filter>
+    <ClCompile Include="src\Render\Techniques\LambertianReflectance.cpp">
+      <Filter>Renderer\Techniques</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Application.hpp" />
-    <ClInclude Include="src\Subsystem.hpp" />
-    <ClInclude Include="src\WindowsIncludes.hpp" />
-    <ClInclude Include="src\Helpers.hpp" />
-    <ClInclude Include="src\Camera.hpp" />
-    <ClInclude Include="src\Scene.hpp" />
-    <ClInclude Include="src\Math.hpp" />
     <ClInclude Include="external\DirectXMath\DirectXCollision.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXColors.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMath.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathAVX.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathAVX2.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathBE.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathF16C.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathFMA3.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathFMA4.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathSSE3.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathSSE4.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXPackedVector.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXSH.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\Stereo3DMatrixHelper.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\XDSP.h">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </ClInclude>
-    <ClInclude Include="src\GraphicsAPI.hpp" />
-    <ClInclude Include="src\BulkDataContainer.hpp" />
-    <ClInclude Include="src\DirectX12_Impl\d3dx12.h">
-      <Filter>DirectX12_Impl</Filter>
+    <ClInclude Include="src\Application.hpp" />
+    <ClInclude Include="src\AssetLoader.hpp" />
+    <ClInclude Include="src\GraphicsInterlayer.hpp" />
+    <ClInclude Include="src\Helpers.hpp" />
+    <ClInclude Include="src\Scene.hpp" />
+    <ClInclude Include="src\WindowsIncludes.hpp" />
+    <ClInclude Include="src\GAPI\dx12\CommonStuff.hpp">
+      <Filter>GAPI\dx12</Filter>
     </ClInclude>
-    <ClInclude Include="src\DirectX12_Impl\GraphicsCommonStuff.hpp">
-      <Filter>DirectX12_Impl</Filter>
+    <ClInclude Include="src\GAPI\dx12\d3dx12.h">
+      <Filter>GAPI\dx12</Filter>
     </ClInclude>
-    <ClInclude Include="src\AssetLoader\AssetTypes.hpp">
-      <Filter>AssetLoader</Filter>
+    <ClInclude Include="src\GAPI\dx12\StuffCreator.hpp">
+      <Filter>GAPI\dx12</Filter>
     </ClInclude>
-    <ClInclude Include="src\GraphicsVertexTypes.hpp" />
-    <ClInclude Include="src\DirectX12_Impl\D3D12StuffCreator.hpp">
-      <Filter>DirectX12_Impl</Filter>
+    <ClInclude Include="src\Mathematics\Mathematics.hpp">
+      <Filter>Mathematics</Filter>
     </ClInclude>
-    <ClInclude Include="src\AssetLoaderAPI.hpp" />
+    <ClInclude Include="src\Scene\Camera.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Render\Render.cpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Render.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="DirectXMath">
+    <Filter Include="External">
+      <UniqueIdentifier>{82306866-6d34-4c89-81df-a53682abcdb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\DirectXMath">
       <UniqueIdentifier>{3f928ccf-7018-44a1-9f1c-032593d56952}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Imgui">
+    <Filter Include="External\Imgui">
       <UniqueIdentifier>{5686987b-ca55-4a13-aea5-0e3ba22dcacc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="shaders">
-      <UniqueIdentifier>{a0a461e5-9c50-40b2-b536-03c28d155fb6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DirectX12_Impl">
-      <UniqueIdentifier>{f1c50a87-aba8-4862-bc6a-38871eb5117f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AssetLoader">
-      <UniqueIdentifier>{d3bb17dd-588e-423f-802a-9905efc130fd}</UniqueIdentifier>
+      <UniqueIdentifier>{2e37ca68-4fae-4749-b133-233692d809fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Containers">
+      <UniqueIdentifier>{e9b426cb-477e-41a0-9f17-98932db0e2c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GAPI">
+      <UniqueIdentifier>{2ecaac80-5e00-41d6-af00-468006272edb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GAPI\dx12">
+      <UniqueIdentifier>{b9c140fb-8e8f-41e7-b864-b3afe4a39fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{3be04cf0-3103-45dc-a8f3-c4f5d55acf27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mathematics">
+      <UniqueIdentifier>{813e9046-e4a0-41b9-9e98-2cdbafbffba6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{e4ee85e8-e46c-4111-90b1-abe46032d020}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GAPI\dx12\Shaders">
+      <UniqueIdentifier>{b613767d-35ea-45d5-b4f4-0384d57474ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Techniques">
+      <UniqueIdentifier>{c16b12b7-badc-4cab-b715-ad96954f5a43}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="external\DirectXMath\DirectXCollision.inl">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </None>
     <None Include="external\DirectXMath\DirectXMathConvert.inl">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </None>
     <None Include="external\DirectXMath\DirectXMathMatrix.inl">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </None>
     <None Include="external\DirectXMath\DirectXMathMisc.inl">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </None>
     <None Include="external\DirectXMath\DirectXMathVector.inl">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </None>
     <None Include="external\DirectXMath\DirectXPackedVector.inl">
-      <Filter>DirectXMath</Filter>
+      <Filter>External\DirectXMath</Filter>
     </None>
-    <None Include="src\shaders\flat_color.frag.hlsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="src\shaders\flat_color.hlsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="src\shaders\flat_color.vert.hlsl">
-      <Filter>shaders</Filter>
+    <None Include="src\GAPI\dx12\Shaders\flat_color.hlsl">
+      <Filter>GAPI\dx12\Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>
