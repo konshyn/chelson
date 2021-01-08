@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\RendererDirectX12.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="external\DirectXMath\DirectXSH.cpp">
       <Filter>DirectXMath</Filter>
@@ -17,18 +16,34 @@
     <ClCompile Include="external\DirectXMath\Stereo3DMatrixHelper.cpp">
       <Filter>DirectXMath</Filter>
     </ClCompile>
-    <ClCompile Include="src\Mesh.cpp" />
-    <ClCompile Include="src\ResourceLoader.cpp" />
+    <ClCompile Include="src\DirectX12_Impl\GraphicsDirectX12.cpp">
+      <Filter>DirectX12_Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirectX12_Impl\GraphicsResourceLoader.cpp">
+      <Filter>DirectX12_Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AssetLoader\PreparedMeshLoader.cpp">
+      <Filter>AssetLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AssetLoader\PreparedSceneLoader.cpp">
+      <Filter>AssetLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirectX12_Impl\GraphicsSwapChain.cpp">
+      <Filter>DirectX12_Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirectX12_Impl\Renderer.cpp">
+      <Filter>DirectX12_Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirectX12_Impl\D3D12StuffCreator.cpp">
+      <Filter>DirectX12_Impl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.hpp" />
     <ClInclude Include="src\Subsystem.hpp" />
     <ClInclude Include="src\WindowsIncludes.hpp" />
     <ClInclude Include="src\Helpers.hpp" />
-    <ClInclude Include="src\Renderer.hpp" />
-    <ClInclude Include="src\d3dx12.h" />
     <ClInclude Include="src\Camera.hpp" />
-    <ClInclude Include="src\Mesh.hpp" />
     <ClInclude Include="src\Scene.hpp" />
     <ClInclude Include="src\Math.hpp" />
     <ClInclude Include="external\DirectXMath\DirectXCollision.h">
@@ -76,9 +91,22 @@
     <ClInclude Include="external\DirectXMath\XDSP.h">
       <Filter>DirectXMath</Filter>
     </ClInclude>
-    <ClInclude Include="src\ResourceLoader.hpp" />
-    <ClInclude Include="src\ResourceRefsStorage.hpp" />
-    <ClInclude Include="src\C++STL.hpp" />
+    <ClInclude Include="src\GraphicsAPI.hpp" />
+    <ClInclude Include="src\BulkDataContainer.hpp" />
+    <ClInclude Include="src\DirectX12_Impl\d3dx12.h">
+      <Filter>DirectX12_Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DirectX12_Impl\GraphicsCommonStuff.hpp">
+      <Filter>DirectX12_Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AssetLoader\AssetTypes.hpp">
+      <Filter>AssetLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsVertexTypes.hpp" />
+    <ClInclude Include="src\DirectX12_Impl\D3D12StuffCreator.hpp">
+      <Filter>DirectX12_Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AssetLoaderAPI.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="DirectXMath">
@@ -89,6 +117,12 @@
     </Filter>
     <Filter Include="shaders">
       <UniqueIdentifier>{a0a461e5-9c50-40b2-b536-03c28d155fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectX12_Impl">
+      <UniqueIdentifier>{f1c50a87-aba8-4862-bc6a-38871eb5117f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AssetLoader">
+      <UniqueIdentifier>{d3bb17dd-588e-423f-802a-9905efc130fd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

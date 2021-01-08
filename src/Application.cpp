@@ -3,7 +3,7 @@
 #include <chrono>
 
 #include "Application.hpp"
-#include "Renderer.hpp"
+#include "GraphicsAPI.hpp"
 
 LRESULT CALLBACK Application::WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -88,13 +88,13 @@ void Application::KeyDownEvent(WPARAM wParam)
     switch (wParam)
     {
     case 'V':
-        renderer::ToggleVSync();
+        ToggleVSync();
         break;
     case 'T':
-        renderer::ToggleTearing();
+        ToggleTearing();
         break;
     case 'F': 
-        renderer::ToggleFullscreen(); 
+        ToggleFullscreen(); 
         break;
     case VK_ESCAPE: 
         ::PostQuitMessage(0); 
@@ -112,7 +112,7 @@ void Application::ResizeWindowEvent()
     int width = clientRect.right - clientRect.left;
     int height = clientRect.bottom - clientRect.top;
 
-    renderer::ResizeSwapChain(width, height);
+    graphics::ResizeSwapChain(width, height);
 
     //m_swapChain.Resize(width, height);
 }
@@ -130,7 +130,9 @@ bool Application::Initialize(HINSTANCE hInstance)
     CreateWindow(hInstance);
     assert(m_hwnd && "Failed to create window");
 
-    renderer::Initialize(m_hwnd, true);
+    graphics::Initialize(true);
+    graphics::CreateSwapChain(m_hwnd, m_windowWidth, m_windowHeight);
+
     FillTriangleScene(scene);
 
     m_isInitialize = result;
@@ -157,10 +159,10 @@ void Application::Run()
         }
 
         Update();
-        renderer::Render(&scene);
+        graphics::Render(&scene);
     }
 
-    renderer::RequestExit();
+    graphics::RequestExit();
 }
 
 
@@ -185,5 +187,86 @@ void Application::Update()
 
         frameCounter = 0;
         elapsedSeconds = 0.0;
+    }
+}
+
+void Application::SetVSync(bool vsync)
+{
+    m_vsync = vsync;
+}
+
+bool Application::IsVSync()
+{
+    return m_vsync;
+}
+
+void Application::ToggleVSync()
+{
+    m_vsync = !m_vsync;
+}
+
+void Application::SetFullscreen(bool fullscreen)
+{
+    if (m_fullscreen != fullscreen) {
+        m_fullscreen = fullscreen;
+
+        if (m_fullscreen) { // Switching to fullscreen.
+            // Store the current window dimensions so they can be restored 
+            // when switching out of fullscreen state.
+            ::GetWindowRect(m_hwnd, &m_windowRect);
+
+            // Set the window style to a borderless window so the client area fills
+            // the entire screen.
+            UINT windowStyle = WS_OVERLAPPEDWINDOW & ~(WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
+
+            ::SetWindowLongW(m_hwnd, GWL_STYLE, windowStyle);
+
+            // Query the name of the nearest display device for the window.
+            // This is required to set the fullscreen dimensions of the window
+            // when using a multi-monitor setup.
+            HMONITOR hMonitor = ::MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTONEAREST);
+            MONITORINFOEX monitorInfo = {};
+            monitorInfo.cbSize = sizeof(MONITORINFOEX);
+            ::GetMonitorInfo(hMonitor, &monitorInfo);
+
+            ::SetWindowPos(m_hwnd, HWND_TOPMOST,
+                monitorInfo.rcMonitor.left,
+                monitorInfo.rcMonitor.top,
+                monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
+                monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
+                SWP_FRAMECHANGED | SWP_NOACTIVATE);
+
+            ::ShowWindow(m_hwnd, SW_MAXIMIZE);
+        }
+        else {
+            // Restore all the window decorators.
+            ::SetWindowLong(m_hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+
+            ::SetWindowPos(m_hwnd, HWND_NOTOPMOST,
+                m_windowRect.left,
+                m_windowRect.top,
+                m_windowRect.right - m_windowRect.left,
+                m_windowRect.bottom - m_windowRect.top,
+                SWP_FRAMECHANGED | SWP_NOACTIVATE);
+
+            ::ShowWindow(m_hwnd, SW_NORMAL);
+        }
+    }
+}
+
+bool Application::IsFullscreen()
+{
+    return m_fullscreen;
+}
+
+void Application::ToggleFullscreen()
+{
+    SetFullscreen(!m_fullscreen);
+}
+
+void Application::ToggleTearing()
+{
+    if (IsSupportTearing()) {
+        m_allowTearing = !m_allowTearing;
     }
 }

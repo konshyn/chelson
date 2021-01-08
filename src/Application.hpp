@@ -25,6 +25,10 @@ private:
 
     Scene scene;
 
+    bool m_vsync{ true };
+    bool m_allowTearing{ false };
+    bool m_fullscreen{ false };
+
 public:
     Application(const Application &) = delete;
     Application & operator=(const Application &) = delete;
@@ -40,6 +44,16 @@ private:
     void CreateWindow(HINSTANCE hInst);
 
     void Update();
+
+    void SetVSync(bool vsync);
+    bool IsVSync();
+    void ToggleVSync();
+
+    void SetFullscreen(bool fullscreen);
+    bool IsFullscreen();
+    void ToggleFullscreen();
+
+    void ToggleTearing();
 
 public:
     static LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);

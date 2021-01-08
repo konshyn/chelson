@@ -1,44 +1,23 @@
-﻿#include "Renderer.hpp"
-#include "Helpers.hpp"
+﻿#include "GraphicsCommonStuff.hpp"
 
-// DirectX 12 specific headers.
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include <d3dcompiler.h>
+
 #include <DirectXMath.h>
-
-
-// D3D12 extension library.
-#include "d3dx12.h"
-
 #include <algorithm>
 #include <chrono>
 #include <iostream>
 
-#include "Scene.hpp"
+#include "../GraphicsAPI.hpp"
+#include "../Helpers.hpp"
 
-using namespace renderer;
+#include "../Scene.hpp"
+
+// D3D12 extension library.
+#include "d3dx12.h"
 
 namespace //global render state
 {
-    bool g_IsInitialized{false};
-    bool g_EnableDebugLayer{false};
-    bool g_VSync{true};
-    bool g_TearingSupported{ false };
-    bool g_Fullscreen{ false };
-
-    constexpr uint8_t g_NumFrames{3};
-
-    HWND g_HWND{};
-    uint32_t g_ClientWidth{};
-    uint32_t g_ClientHeight{};
-    // Window rectangle (used to toggle fullscreen state).
-    RECT g_WindowRect{};
-    
-    ComPtr<ID3D12Device2> g_Device;
     ComPtr<ID3D12CommandQueue> g_CommandQueue;
-    ComPtr<IDXGISwapChain4> g_SwapChain;
-    ComPtr<ID3D12Resource> g_BackBuffers[g_NumFrames];
+
     ComPtr<ID3D12GraphicsCommandList> g_CommandList;
     ComPtr<ID3D12CommandAllocator> g_CommandAllocators[g_NumFrames];
     ComPtr<ID3D12DescriptorHeap> g_RTVDescriptorHeap;
@@ -58,13 +37,12 @@ namespace //global render state
 
     ComPtr<ID3DBlob> g_VertexShader;
     ComPtr<ID3DBlob> g_PixelShader;
+}
 
-    ComPtr<ID3D12Resource> g_VertexBuffer;
-    D3D12_VERTEX_BUFFER_VIEW g_VertexBufferView;
-
-
+namespace 
+{
 ////////////////////////////////////////
-    ComPtr<IDXGIAdapter4> GetAdapter()
+    void CreateAdapter()
     {
         ComPtr<IDXGIFactory4> dxgiFactory;
         UINT createFactoryFlags = 0;
@@ -75,7 +53,6 @@ namespace //global render state
         ThrowIfFailed(CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory)));
 
         ComPtr<IDXGIAdapter1> dxgiAdapter1;
-        ComPtr<IDXGIAdapter4> dxgiAdapter4;
 
         SIZE_T maxDedicatedVideoMemory = 0;
         for (UINT i = 0; dxgiFactory->EnumAdapters1(i, &dxgiAdapter1) != DXGI_ERROR_NOT_FOUND; ++i) {
@@ -90,22 +67,20 @@ namespace //global render state
                 dxgiAdapterDesc1.DedicatedVideoMemory > maxDedicatedVideoMemory)
             {
                 maxDedicatedVideoMemory = dxgiAdapterDesc1.DedicatedVideoMemory;
-                ThrowIfFailed(dxgiAdapter1.As(&dxgiAdapter4));
+                ThrowIfFailed(dxgiAdapter1.As(&g_dxgiAdapter4));
             }
         }
-
-        return dxgiAdapter4;
     }
 
-    ComPtr<ID3D12Device2> CreateDevice(ComPtr<IDXGIAdapter4> adapter)
+    void CreateDevice()
     {
-        ComPtr<ID3D12Device2> d3d12Device2;
-        ThrowIfFailed(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&d3d12Device2)));
+        assert(g_dxgiAdapter4);
+        ThrowIfFailed(D3D12CreateDevice(g_dxgiAdapter4.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&g_Device)));
 
         // Enable debug messages in debug mode.
         if (g_EnableDebugLayer) {
             ComPtr<ID3D12InfoQueue> pInfoQueue;
-            if (SUCCEEDED(d3d12Device2.As(&pInfoQueue))) {
+            if (SUCCEEDED(g_Device.As(&pInfoQueue))) {
                 pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
                 pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
                 pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
@@ -136,88 +111,8 @@ namespace //global render state
                 ThrowIfFailed(pInfoQueue->PushStorageFilter(&NewFilter));
             }
         }
-
-        return d3d12Device2;
     }
 
-    ComPtr<ID3D12CommandQueue> CreateCommandQueue(ComPtr<ID3D12Device2> device, D3D12_COMMAND_LIST_TYPE type)
-    {
-        ComPtr<ID3D12CommandQueue> d3d12CommandQueue;
-
-        D3D12_COMMAND_QUEUE_DESC desc = {};
-        desc.Type = type;
-        desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
-        desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-        desc.NodeMask = 0;
-
-        ThrowIfFailed(device->CreateCommandQueue(&desc, IID_PPV_ARGS(&d3d12CommandQueue)));
-
-        return d3d12CommandQueue;
-    }
-
-    bool CheckTearingSupport()
-    {
-        BOOL allowTearing = FALSE;
-
-        // Rather than create the DXGI 1.5 factory interface directly, we create the
-        // DXGI 1.4 interface and query for the 1.5 interface. This is to enable the 
-        // graphics debugging tools which will not support the 1.5 factory interface 
-        // until a future update.
-        ComPtr<IDXGIFactory4> factory4;
-        if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory4)))) {
-            ComPtr<IDXGIFactory5> factory5;
-            if (SUCCEEDED(factory4.As(&factory5))) {
-                if (FAILED(factory5->CheckFeatureSupport( DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing)))) {
-                    allowTearing = FALSE;
-                }
-            }
-        }
-
-        return allowTearing == TRUE;
-    }
-
-    ComPtr<IDXGISwapChain4> CreateSwapChain(HWND hWnd, ComPtr<ID3D12CommandQueue> commandQueue, uint32_t width, uint32_t height, uint32_t bufferCount)
-    {
-        ComPtr<IDXGISwapChain4> dxgiSwapChain4;
-        ComPtr<IDXGIFactory4> dxgiFactory4;
-        UINT createFactoryFlags = 0;
-        if (g_EnableDebugLayer) {
-            createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
-        }
-
-        ThrowIfFailed(CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory4)));
-
-        DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-        swapChainDesc.Width = width;
-        swapChainDesc.Height = height;
-        swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        swapChainDesc.Stereo = FALSE;
-        swapChainDesc.SampleDesc = { 1, 0 };
-        swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        swapChainDesc.BufferCount = bufferCount;
-        swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
-        swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-        swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-        // It is recommended to always allow tearing if tearing support is available.
-        swapChainDesc.Flags = CheckTearingSupport() ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
-
-        ComPtr<IDXGISwapChain1> swapChain1;
-        ThrowIfFailed(dxgiFactory4->CreateSwapChainForHwnd(
-            commandQueue.Get(),
-            hWnd,
-            &swapChainDesc,
-            nullptr,
-            nullptr,
-            &swapChain1));
-
-        // Disable the Alt+Enter fullscreen toggle feature. Switching to fullscreen
-        // will be handled manually.
-        ThrowIfFailed(dxgiFactory4->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER));
-
-        ThrowIfFailed(swapChain1.As(&dxgiSwapChain4));
-
-        return dxgiSwapChain4;
-    }
 
     ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(ComPtr<ID3D12Device2> device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptors)
     {
@@ -372,23 +267,7 @@ namespace //global render state
 
     }
 
-    void UpdateRenderTargetViews(ComPtr<ID3D12Device2> device, ComPtr<IDXGISwapChain4> swapChain, ComPtr<ID3D12DescriptorHeap> descriptorHeap)
-    {
-        auto rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-        CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(descriptorHeap->GetCPUDescriptorHandleForHeapStart());
-
-        for (int i = 0; i < g_NumFrames; ++i) {
-            ComPtr<ID3D12Resource> backBuffer;
-            ThrowIfFailed(swapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffer)));
-
-            device->CreateRenderTargetView(backBuffer.Get(), nullptr, rtvHandle);
-
-            g_BackBuffers[i] = backBuffer;
-
-            rtvHandle.Offset(rtvDescriptorSize);
-        }
-    }
 
     ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(ComPtr<ID3D12Device2> device, D3D12_COMMAND_LIST_TYPE type)
     {
@@ -443,11 +322,7 @@ namespace //global render state
         }
     }
 
-    void Flush(ComPtr<ID3D12CommandQueue> commandQueue, ComPtr<ID3D12Fence> fence, uint64_t& fenceValue, HANDLE fenceEvent) 
-    {
-        uint64_t fenceValueForSignal = Signal(commandQueue, fence, fenceValue);
-        WaitForFenceValue(fence, fenceValueForSignal, fenceEvent);
-    }
+
 
     void EnableDebugLayer()
     {
@@ -459,29 +334,18 @@ namespace //global render state
 } // namespace
 
 
-namespace renderer
+namespace graphics
 {
-    void Initialize(HWND hwnd, bool enableDebugLayer /* = false */)
+    void InitGPU(bool enableDebugLayer /* = false */)
     {
-        g_HWND = hwnd;
         if (enableDebugLayer) {
             EnableDebugLayer();
         }
 
-        EnableDebugLayer();
-
-        g_TearingSupported = CheckTearingSupport();
-
-        // Initialize the global window rect variable.
-        ::GetWindowRect(g_HWND, &g_WindowRect);
-
-        ComPtr<IDXGIAdapter4> dxgiAdapter4 = GetAdapter();
-
-        g_Device = CreateDevice(dxgiAdapter4);
+        CreateAdapter();
+        CreateDevice();
 
         g_CommandQueue = CreateCommandQueue(g_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
-
-        g_SwapChain = CreateSwapChain(g_HWND, g_CommandQueue, g_ClientWidth, g_ClientHeight, g_NumFrames);
 
         g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
 
@@ -506,179 +370,12 @@ namespace renderer
         LoadShaders(g_Device);
         CreatePipelineStateObject(g_Device);
         //g_CommandList = CreateCommandList(g_Device, g_CommandAllocators[g_CurrentBackBufferIndex], D3D12_COMMAND_LIST_TYPE_DIRECT);
-        g_IsInitialized = true;
     }
-
-    void ResizeSwapChain(int width, int height)
-    {
-        if (g_ClientWidth != width || g_ClientHeight != height) {
-            // Don't allow 0 size swap chain back buffers.
-            g_ClientWidth = std::max(1, width);
-            g_ClientHeight = std::max(1, height);
-
-            g_Viewport = CD3DX12_VIEWPORT{0.0f, 0.0f, static_cast<float>(g_ClientWidth), static_cast<float>(g_ClientHeight)};
-            g_ScissorRect = CD3DX12_RECT{0, 0, static_cast<LONG>(g_ClientWidth), static_cast<LONG>(g_ClientHeight)};
-            //g_ScissorRect = CD3DX12_RECT{0, 0, 100, 100};
-
-            // Flush the GPU queue to make sure the swap chain's back buffers
-            // are not being referenced by an in-flight command list.
-            Flush(g_CommandQueue, g_Fence, g_FenceValue, g_FenceEvent);
-
-            for (int i = 0; i < g_NumFrames; ++i) {
-                // Any references to the back buffers must be released
-                // before the swap chain can be resized.
-                g_BackBuffers[i].Reset();
-                g_FrameFenceValues[i] = g_FrameFenceValues[g_CurrentBackBufferIndex];
-            }
-
-            DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
-            ThrowIfFailed(g_SwapChain->GetDesc(&swapChainDesc));
-            ThrowIfFailed(g_SwapChain->ResizeBuffers(g_NumFrames, g_ClientWidth, g_ClientHeight, swapChainDesc.BufferDesc.Format, swapChainDesc.Flags));
-
-            g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
-
-            UpdateRenderTargetViews(g_Device, g_SwapChain, g_RTVDescriptorHeap);
-        }
-    }
-
-    void SetVSync(bool vsync)
-    {
-        g_VSync = vsync;
-    }
-
-    bool IsVSync()
-    {
-        return g_VSync;
-    }
-
-    void ToggleVSync()
-    {
-        g_VSync = !g_VSync;
-    }
-
-    void SetFullscreen(bool fullscreen)
-    {
-        if (g_Fullscreen != fullscreen) {
-            g_Fullscreen = fullscreen;
-
-            if (g_Fullscreen) { // Switching to fullscreen.
-                // Store the current window dimensions so they can be restored 
-                // when switching out of fullscreen state.
-                ::GetWindowRect(g_HWND, &g_WindowRect);
-
-                // Set the window style to a borderless window so the client area fills
-                // the entire screen.
-                UINT windowStyle = WS_OVERLAPPEDWINDOW & ~(WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
-
-                ::SetWindowLongW(g_HWND, GWL_STYLE, windowStyle);
-
-                // Query the name of the nearest display device for the window.
-                // This is required to set the fullscreen dimensions of the window
-                // when using a multi-monitor setup.
-                HMONITOR hMonitor = ::MonitorFromWindow(g_HWND, MONITOR_DEFAULTTONEAREST);
-                MONITORINFOEX monitorInfo = {};
-                monitorInfo.cbSize = sizeof(MONITORINFOEX);
-                ::GetMonitorInfo(hMonitor, &monitorInfo);
-
-                ::SetWindowPos(g_HWND, HWND_TOPMOST,
-                    monitorInfo.rcMonitor.left,
-                    monitorInfo.rcMonitor.top,
-                    monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
-                    monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
-                    SWP_FRAMECHANGED | SWP_NOACTIVATE);
-
-                ::ShowWindow(g_HWND, SW_MAXIMIZE);
-            } else {
-                // Restore all the window decorators.
-                ::SetWindowLong(g_HWND, GWL_STYLE, WS_OVERLAPPEDWINDOW);
-
-                ::SetWindowPos(g_HWND, HWND_NOTOPMOST,
-                    g_WindowRect.left,
-                    g_WindowRect.top,
-                    g_WindowRect.right - g_WindowRect.left,
-                    g_WindowRect.bottom - g_WindowRect.top,
-                    SWP_FRAMECHANGED | SWP_NOACTIVATE);
-
-                ::ShowWindow(g_HWND, SW_NORMAL);
-            }
-        }
-    }
-
-    bool IsFullscreen()
-    {
-        return g_Fullscreen;
-    }
-
-    void ToggleFullscreen()
-    {
-        SetFullscreen(!g_Fullscreen);
-    }
-
-    void ToggleTearing()
-    {
-        g_TearingSupported = !g_TearingSupported;
-    }
-
-    void Render(Scene *scene)
-    {
-        auto commandAllocator = g_CommandAllocators[g_CurrentBackBufferIndex];
-        auto backBuffer = g_BackBuffers[g_CurrentBackBufferIndex];
-
-        commandAllocator->Reset();
-        g_CommandList->Reset(commandAllocator.Get(), nullptr);
-
-        {
-
-            g_CommandList->SetPipelineState(g_PipelineState.Get());
-            // Set necessary state.
-            g_CommandList->SetGraphicsRootSignature(g_RootSignature.Get());
-            g_CommandList->RSSetViewports(1, &g_Viewport);
-            g_CommandList->RSSetScissorRects(1, &g_ScissorRect);
-
-            CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-            g_CommandList->ResourceBarrier(1, &barrier);
-
-            FLOAT clearColor[] = { 0.05f, 0.15f, 0.25f, 1.0f };
-            CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(g_RTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), g_CurrentBackBufferIndex, g_RTVDescriptorSize);
-            g_CommandList->OMSetRenderTargets(1, &rtv, FALSE, nullptr);
-            g_CommandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
-
-
-            // Record commands.
-            g_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-            g_CommandList->IASetVertexBuffers(0, 1, &g_VertexBufferView);
-            g_CommandList->DrawInstanced(3, 1, 0, 0);
-        }
-
-        // Present
-        {
-            CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-            g_CommandList->ResourceBarrier(1, &barrier);
-
-            ThrowIfFailed(g_CommandList->Close());
-
-            ID3D12CommandList* const commandLists[] = {
-                g_CommandList.Get()
-            };
-
-            g_CommandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
-
-            g_FrameFenceValues[g_CurrentBackBufferIndex] = Signal(g_CommandQueue, g_Fence, g_FenceValue);
-
-            UINT syncInterval = g_VSync ? 1 : 0;
-            UINT presentFlags = g_TearingSupported && !g_VSync ? DXGI_PRESENT_ALLOW_TEARING : 0;
-            ThrowIfFailed(g_SwapChain->Present(syncInterval, presentFlags));
-
-            UINT prevBackbufferIndex = g_CurrentBackBufferIndex;
-            g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
-
-            WaitForFenceValue(g_Fence, g_FrameFenceValues[g_CurrentBackBufferIndex], g_FenceEvent);
-        }
-    }
-
+    
     void RequestExit()
     {
         Flush(g_CommandQueue, g_Fence, g_FenceValue, g_FenceEvent);
     }
+
+
 }

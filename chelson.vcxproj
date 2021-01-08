@@ -91,10 +91,14 @@
     <ClCompile Include="external\DirectXMath\DirectXSHD3D12.cpp" />
     <ClCompile Include="external\DirectXMath\Stereo3DMatrixHelper.cpp" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\AssetLoader\PreparedMeshLoader.cpp" />
+    <ClCompile Include="src\AssetLoader\PreparedSceneLoader.cpp" />
+    <ClCompile Include="src\DirectX12_Impl\D3D12StuffCreator.cpp" />
+    <ClCompile Include="src\DirectX12_Impl\GraphicsDirectX12.cpp" />
+    <ClCompile Include="src\DirectX12_Impl\GraphicsResourceLoader.cpp" />
+    <ClCompile Include="src\DirectX12_Impl\GraphicsSwapChain.cpp" />
+    <ClCompile Include="src\DirectX12_Impl\Renderer.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Mesh.cpp" />
-    <ClCompile Include="src\RendererDirectX12.cpp" />
-    <ClCompile Include="src\ResourceLoader.cpp" />
     <ClCompile Include="src\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -114,15 +118,17 @@
     <ClInclude Include="external\DirectXMath\Stereo3DMatrixHelper.h" />
     <ClInclude Include="external\DirectXMath\XDSP.h" />
     <ClInclude Include="src\Application.hpp" />
-    <ClInclude Include="src\C++STL.hpp" />
+    <ClInclude Include="src\AssetLoaderAPI.hpp" />
+    <ClInclude Include="src\AssetLoader\AssetTypes.hpp" />
+    <ClInclude Include="src\BulkDataContainer.hpp" />
     <ClInclude Include="src\Camera.hpp" />
-    <ClInclude Include="src\d3dx12.h" />
+    <ClInclude Include="src\DirectX12_Impl\D3D12StuffCreator.hpp" />
+    <ClInclude Include="src\DirectX12_Impl\d3dx12.h" />
+    <ClInclude Include="src\DirectX12_Impl\GraphicsCommonStuff.hpp" />
+    <ClInclude Include="src\GraphicsVertexTypes.hpp" />
     <ClInclude Include="src\Helpers.hpp" />
     <ClInclude Include="src\Math.hpp" />
-    <ClInclude Include="src\Mesh.hpp" />
-    <ClInclude Include="src\Renderer.hpp" />
-    <ClInclude Include="src\ResourceLoader.hpp" />
-    <ClInclude Include="src\ResourceRefsStorage.hpp" />
+    <ClInclude Include="src\GraphicsAPI.hpp" />
     <ClInclude Include="src\Scene.hpp" />
     <ClInclude Include="src\Subsystem.hpp" />
     <ClInclude Include="src\WindowsIncludes.hpp" />
