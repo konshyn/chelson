@@ -18,13 +18,7 @@
     <ClCompile Include="src\GAPI\dx12\DirectX12.cpp">
       <Filter>GAPI\dx12</Filter>
     </ClCompile>
-    <ClCompile Include="src\GAPI\dx12\Renderer.cpp">
-      <Filter>GAPI\dx12</Filter>
-    </ClCompile>
     <ClCompile Include="src\GAPI\dx12\ResourceLoader.cpp">
-      <Filter>GAPI\dx12</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GAPI\dx12\StuffCreator.cpp">
       <Filter>GAPI\dx12</Filter>
     </ClCompile>
     <ClCompile Include="src\GAPI\dx12\SwapChain.cpp">
@@ -33,8 +27,17 @@
     <ClCompile Include="src\Scene\Scene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\Render\Techniques\LambertianReflectance.cpp">
-      <Filter>Renderer\Techniques</Filter>
+    <ClCompile Include="src\AssetLoader\PreparedMeshLoader.cpp">
+      <Filter>AssetLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AssetLoader\PreparedSceneLoader.cpp">
+      <Filter>AssetLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GAPI\dx12\Common.cpp">
+      <Filter>GAPI\dx12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GAPI\dx12\RenderPass.cpp">
+      <Filter>GAPI\dx12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -89,15 +92,6 @@
     <ClInclude Include="src\Helpers.hpp" />
     <ClInclude Include="src\Scene.hpp" />
     <ClInclude Include="src\WindowsIncludes.hpp" />
-    <ClInclude Include="src\GAPI\dx12\CommonStuff.hpp">
-      <Filter>GAPI\dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GAPI\dx12\d3dx12.h">
-      <Filter>GAPI\dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GAPI\dx12\StuffCreator.hpp">
-      <Filter>GAPI\dx12</Filter>
-    </ClInclude>
     <ClInclude Include="src\Mathematics\Mathematics.hpp">
       <Filter>Mathematics</Filter>
     </ClInclude>
@@ -108,6 +102,21 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Render.hpp" />
+    <ClInclude Include="src\Containers\Bulk.hpp">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AssetLoader\AssetTypes.hpp">
+      <Filter>AssetLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GAPI\dx12\d3dx12.hpp">
+      <Filter>GAPI\dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GAPI\dx12\Common.hpp">
+      <Filter>GAPI\dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GAPI\dx12\RenderPass.hpp">
+      <Filter>GAPI\dx12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
@@ -142,9 +151,6 @@
     </Filter>
     <Filter Include="GAPI\dx12\Shaders">
       <UniqueIdentifier>{b613767d-35ea-45d5-b4f4-0384d57474ba}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Renderer\Techniques">
-      <UniqueIdentifier>{c16b12b7-badc-4cab-b715-ad96954f5a43}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

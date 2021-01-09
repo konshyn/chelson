@@ -3,7 +3,7 @@
 #include <vector>
 
 template<typename ObjectType>
-class BulkDataContainer
+class Bulk
 {
     using ItemID = uint32_t;
 public:    
@@ -16,20 +16,20 @@ private:
 };
 
 template<typename T>
-BulkDataContainer<T>::ItemID BulkDataContainer<T>::AllocateItem()
+Bulk<T>::ItemID Bulk<T>::AllocateItem()
 {
     m_items.push_back();
     return static_cast<ItemID>(m_items.size());
 }
 
 template<typename T>
-void BulkDataContainer<T>::DeleteItem(ItemID item)
+void Bulk<T>::DeleteItem(ItemID item)
 {
     assert(false);
 }
 
 template<typename T>
-T & BulkDataContainer<T>::GetUnderlyingItem(ItemID item)
+T & Bulk<T>::GetUnderlyingItem(ItemID item)
 {
     return m_items[item];
 }

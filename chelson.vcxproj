@@ -91,13 +91,14 @@
     <ClCompile Include="external\DirectXMath\DirectXSHD3D12.cpp" />
     <ClCompile Include="external\DirectXMath\Stereo3DMatrixHelper.cpp" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\AssetLoader\PreparedMeshLoader.cpp" />
+    <ClCompile Include="src\AssetLoader\PreparedSceneLoader.cpp" />
+    <ClCompile Include="src\GAPI\dx12\Common.cpp" />
     <ClCompile Include="src\GAPI\dx12\DirectX12.cpp" />
-    <ClCompile Include="src\GAPI\dx12\Renderer.cpp" />
+    <ClCompile Include="src\GAPI\dx12\RenderPass.cpp" />
     <ClCompile Include="src\GAPI\dx12\ResourceLoader.cpp" />
-    <ClCompile Include="src\GAPI\dx12\StuffCreator.cpp" />
     <ClCompile Include="src\GAPI\dx12\SwapChain.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Render\Techniques\LambertianReflectance.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -118,9 +119,11 @@
     <ClInclude Include="external\DirectXMath\XDSP.h" />
     <ClInclude Include="src\Application.hpp" />
     <ClInclude Include="src\AssetLoader.hpp" />
-    <ClInclude Include="src\GAPI\dx12\CommonStuff.hpp" />
-    <ClInclude Include="src\GAPI\dx12\d3dx12.h" />
-    <ClInclude Include="src\GAPI\dx12\StuffCreator.hpp" />
+    <ClInclude Include="src\AssetLoader\AssetTypes.hpp" />
+    <ClInclude Include="src\Containers\Bulk.hpp" />
+    <ClInclude Include="src\GAPI\dx12\d3dx12.hpp" />
+    <ClInclude Include="src\GAPI\dx12\Common.hpp" />
+    <ClInclude Include="src\GAPI\dx12\RenderPass.hpp" />
     <ClInclude Include="src\GraphicsInterlayer.hpp" />
     <ClInclude Include="src\Helpers.hpp" />
     <ClInclude Include="src\Mathematics\Mathematics.hpp" />

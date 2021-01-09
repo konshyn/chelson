@@ -1,13 +1,12 @@
 #include "AssetTypes.hpp"
 #include <cassert>
-#include "../Math.hpp"
+#include "../Mathematics/Mathematics.hpp"
 #include <vector>
 #include <cstring>
 
 using Vec3 = DirectX::XMFLOAT3;
 
-
-RawMeshDataSoA FillTriangleScene()
+RawMeshDataSoA LoadTriangleScene()
 {
     RawMeshDataSoA mesh{};
 
@@ -27,7 +26,7 @@ RawMeshDataSoA FillTriangleScene()
     mesh.PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 }
 
-RawMeshDataSoA FillSponzaScene()
+RawMeshDataSoA LoadSponzaScene()
 {
     assert(false);
 }

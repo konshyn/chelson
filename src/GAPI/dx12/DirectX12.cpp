@@ -1,43 +1,15 @@
-﻿#include "GraphicsCommonStuff.hpp"
-
+﻿#include "Common.hpp"
 
 #include <DirectXMath.h>
 #include <algorithm>
 #include <chrono>
 #include <iostream>
 
-#include "../GraphicsAPI.hpp"
-#include "../Helpers.hpp"
+#include "../../GraphicsInterlayer.hpp"
+#include "../../Helpers.hpp"
 
-#include "../Scene.hpp"
-
-// D3D12 extension library.
-#include "d3dx12.h"
-
-namespace //global render state
-{
-    ComPtr<ID3D12CommandQueue> g_CommandQueue;
-
-    ComPtr<ID3D12GraphicsCommandList> g_CommandList;
-    ComPtr<ID3D12CommandAllocator> g_CommandAllocators[g_NumFrames];
-    ComPtr<ID3D12DescriptorHeap> g_RTVDescriptorHeap;
-    UINT g_RTVDescriptorSize;
-    UINT g_CurrentBackBufferIndex;
-
-    ComPtr<ID3D12Fence> g_Fence;
-    uint64_t g_FenceValue = 0;
-    uint64_t g_FrameFenceValues[g_NumFrames] {};
-    HANDLE g_FenceEvent;
-
-    ComPtr<ID3D12RootSignature> g_RootSignature;
-
-    CD3DX12_VIEWPORT g_Viewport{};
-    CD3DX12_RECT g_ScissorRect{};
-    ComPtr<ID3D12PipelineState> g_PipelineState;
-
-    ComPtr<ID3DBlob> g_VertexShader;
-    ComPtr<ID3DBlob> g_PixelShader;
-}
+//// D3D12 extension library.
+//#include "d3dx12.hpp"
 
 namespace 
 {
@@ -46,7 +18,7 @@ namespace
     {
         ComPtr<IDXGIFactory4> dxgiFactory;
         UINT createFactoryFlags = 0;
-        if (g_EnableDebugLayer) {
+        if (graphics::g_EnableDebugLayer) {
             createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
         }
 
@@ -67,18 +39,18 @@ namespace
                 dxgiAdapterDesc1.DedicatedVideoMemory > maxDedicatedVideoMemory)
             {
                 maxDedicatedVideoMemory = dxgiAdapterDesc1.DedicatedVideoMemory;
-                ThrowIfFailed(dxgiAdapter1.As(&g_dxgiAdapter4));
+                ThrowIfFailed(dxgiAdapter1.As(&graphics::g_DXGIAdapter4));
             }
         }
     }
 
     void CreateDevice()
     {
-        assert(g_dxgiAdapter4);
-        ThrowIfFailed(D3D12CreateDevice(g_dxgiAdapter4.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&g_Device)));
+        assert(graphics::g_DXGIAdapter4);
+        ThrowIfFailed(D3D12CreateDevice(graphics::g_DXGIAdapter4.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&g_Device)));
 
         // Enable debug messages in debug mode.
-        if (g_EnableDebugLayer) {
+        if (graphics::g_EnableDebugLayer) {
             ComPtr<ID3D12InfoQueue> pInfoQueue;
             if (SUCCEEDED(g_Device.As(&pInfoQueue))) {
                 pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
@@ -113,56 +85,19 @@ namespace
         }
     }
 
-    ComPtr<ID3D12Fence> CreateFence(ComPtr<ID3D12Device2> device)
-    {
-        ComPtr<ID3D12Fence> fence;
-
-        ThrowIfFailed(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
-
-        return fence;
-    }
-
-    HANDLE CreateEventHandle()
-    {
-        HANDLE fenceEvent;
-
-        fenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-        assert(fenceEvent && "Failed to create fence event.");
-
-        return fenceEvent;
-    }
-
-    uint64_t Signal(ComPtr<ID3D12CommandQueue> commandQueue, ComPtr<ID3D12Fence> fence, uint64_t& fenceValue)
-    {
-        uint64_t fenceValueForSignal = ++fenceValue;
-        ThrowIfFailed(commandQueue->Signal(fence.Get(), fenceValueForSignal));
-
-        return fenceValueForSignal;
-    }
-
-    void WaitForFenceValue(ComPtr<ID3D12Fence> fence, uint64_t fenceValue, HANDLE fenceEvent, std::chrono::milliseconds duration = std::chrono::milliseconds::max())
-    {
-        if (fence->GetCompletedValue() < fenceValue) {
-            ThrowIfFailed(fence->SetEventOnCompletion(fenceValue, fenceEvent));
-            ::WaitForSingleObject(fenceEvent, static_cast<DWORD>(duration.count()));
-        }
-    }
-
-
-
     void EnableDebugLayer()
     {
         ComPtr<ID3D12Debug> debugInterface;
         ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface)));
         debugInterface->EnableDebugLayer();
-        g_EnableDebugLayer = true;
+        graphics::g_EnableDebugLayer = true;
     }
 } // namespace
 
 
 namespace graphics
 {
-    void InitGPU(bool enableDebugLayer /* = false */)
+    void InitGraphicsInterlayer(bool enableDebugLayer /* = false */)
     {
         if (enableDebugLayer) {
             EnableDebugLayer();
@@ -171,31 +106,13 @@ namespace graphics
         CreateAdapter();
         CreateDevice();
 
-        g_CommandQueue = CreateCommandQueue(g_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+        D3D12_COMMAND_QUEUE_DESC desc = {};
+        desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+        desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+        desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+        desc.NodeMask = 0;
 
-        g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
-
-        g_RTVDescriptorHeap = CreateDescriptorHeap(g_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, g_NumFrames);
-        g_RTVDescriptorSize = g_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-        UpdateRenderTargetViews(g_Device, g_SwapChain, g_RTVDescriptorHeap);
-
-        for (int i = 0; i < g_NumFrames; ++i) {
-            g_CommandAllocators[i] = CreateCommandAllocator(g_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
-        }
-        g_CommandList = CreateCommandList(g_Device, g_CommandAllocators[g_CurrentBackBufferIndex], D3D12_COMMAND_LIST_TYPE_DIRECT);
-
-        g_Fence = CreateFence(g_Device);
-        g_FenceEvent = CreateEventHandle();
-
-        g_Viewport = CD3DX12_VIEWPORT{ 0.0f, 0.0f, static_cast<float>(g_ClientWidth), static_cast<float>(g_ClientHeight) };
-        g_ScissorRect = CD3DX12_RECT{ 0, 0, static_cast<LONG>(g_ClientWidth), static_cast<LONG>(g_ClientHeight) };
-
-        CreateRootSignature(g_Device);
-        CreateVertexBuffer(g_Device);
-        LoadShaders(g_Device);
-        CreatePipelineStateObject(g_Device);
-        //g_CommandList = CreateCommandList(g_Device, g_CommandAllocators[g_CurrentBackBufferIndex], D3D12_COMMAND_LIST_TYPE_DIRECT);
+        ThrowIfFailed(g_Device->CreateCommandQueue(&desc, IID_PPV_ARGS(&g_DirectCommandQueue)));
     }
     
     void RequestExit()

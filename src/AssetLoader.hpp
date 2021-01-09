@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "RawResourceTypes.hpp"
+#include "AssetLoader/AssetTypes.hpp"
 
-RawMeshDataSoA FillTriangleScene();
-RawMeshDataSoA FillSponzaScene();
+RawMeshDataSoA LoadTriangleScene();
+RawMeshDataSoA LoadSponzaScene();

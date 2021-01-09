@@ -1,6 +1,6 @@
 #pragma once
 
-enum class ELightingType
+enum class ELightingModel
 {
     Default = 0,
     Lambertian = Default,
@@ -8,7 +8,7 @@ enum class ELightingType
     Cartoon
 };
 
-enum class ERenderPassType
+enum class ERenderTechnique
 {
     Default = 0,
     Forward = Default,
@@ -19,7 +19,7 @@ enum class ERenderPassType
 class Scene;
 namespace render
 {
-    void InitRender(ERenderPassType rptype, ELightingType ltype);
+    void InitRender(ERenderTechnique renderTechnique, ELightingModel lightModel);
     void SetScene(Scene *scene);
     void Render();
     void RequestExit();

@@ -1,16 +1,27 @@
 #include <cassert>
 
-#include "../GraphicsAPI.hpp"
-#include "GraphicsCommonStuff.hpp"
+#include "../../GraphicsInterlayer.hpp"
+#include "Common.hpp"
 
-#include "../Helpers.hpp"
+#include "../../Helpers.hpp"
+
+#include "d3dx12.hpp"
 
 namespace
 {
     bool g_IsSupportTearing{false};
+    bool g_AllowTearing{false};
+    bool g_Vsync{true};
     HWND g_HWND{};
     ComPtr<IDXGISwapChain4> g_SwapChain;
     ComPtr<ID3D12Resource> g_BackBuffers[g_NumFrames];
+    ComPtr<ID3D12DescriptorHeap> g_RTVDescriptorHeap;
+    UINT g_RTVDescriptorSize;
+
+    ComPtr<ID3D12Fence> g_Fence;
+    uint64_t g_FenceValue = 0;
+    uint64_t g_FrameFenceValues[g_NumFrames]{};
+    HANDLE g_FenceEvent;
 }
 
 namespace
@@ -36,30 +47,39 @@ namespace
         return allowTearing == TRUE;
     }
 
-    void UpdateRenderTargetViews(ComPtr<ID3D12Device2> device, ComPtr<IDXGISwapChain4> swapChain, ComPtr<ID3D12DescriptorHeap> descriptorHeap)
+    void UpdateRenderTargetViews()
     {
-        auto rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+        assert(graphics::g_Device);
+        assert(g_SwapChain);
+        assert(g_RTVDescriptorHeap);
 
-        CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(descriptorHeap->GetCPUDescriptorHandleForHeapStart());
+        CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(g_RTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
         for (int i = 0; i < g_NumFrames; ++i) {
             ComPtr<ID3D12Resource> backBuffer;
-            ThrowIfFailed(swapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffer)));
+            ThrowIfFailed(g_SwapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffer)));
 
-            device->CreateRenderTargetView(backBuffer.Get(), nullptr, rtvHandle);
+            g_Device->CreateRenderTargetView(backBuffer.Get(), nullptr, rtvHandle);
 
             g_BackBuffers[i] = backBuffer;
 
-            rtvHandle.Offset(rtvDescriptorSize);
+            rtvHandle.Offset(g_RTVDescriptorSize);
         }
+    }
+
+    void Flush(ComPtr<ID3D12CommandQueue> commandQueue, ComPtr<ID3D12Fence> fence, uint64_t& fenceValue, HANDLE fenceEvent)
+    {
+        uint64_t fenceValueForSignal = Signal(commandQueue, fence, fenceValue);
+        WaitForFenceValue(fence, fenceValueForSignal, fenceEvent);
     }
 }
 
 namespace graphics
 {
-    void CreateSwapChain(HWND hwnd, int width, int height)
+    void InitSwapChain(HWND hwnd, int width, int height)
     {
         assert(g_Device);
+        assert(g_DirectCommandQueue);
         g_HWND = hwnd;
         g_ClientWidth = width;
         g_ClientHeight = height;
@@ -88,11 +108,9 @@ namespace graphics
         // It is recommended to always allow tearing if tearing support is available.
         swapChainDesc.Flags = g_IsSupportTearing ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
 
-        ComPtr<ID3D12CommandQueue> commandQueue = CreateCommandQueue();
-
         ComPtr<IDXGISwapChain1> swapChain1;
         ThrowIfFailed(dxgiFactory4->CreateSwapChainForHwnd(
-            commandQueue.Get(),
+            g_DirectCommandQueue.Get(),
             g_HWND,
             &swapChainDesc,
             nullptr,
@@ -104,6 +122,19 @@ namespace graphics
         ThrowIfFailed(dxgiFactory4->MakeWindowAssociation(g_HWND, DXGI_MWA_NO_ALT_ENTER));
 
         ThrowIfFailed(swapChain1.As(&g_SwapChain));
+
+        // Create Descriptor Heap
+        D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+        desc.NumDescriptors = g_NumFrames;
+        desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+
+        ThrowIfFailed(g_Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&g_RTVDescriptorHeap)));
+        g_RTVDescriptorSize = g_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+        UpdateRenderTargetViews();
+
+        g_Fence = CreateFence();
+        g_FenceEvent = CreateEventHandle(L"SwapChainEvent");
     }
 
     void ResizeSwapChain(int width, int height)
@@ -113,49 +144,77 @@ namespace graphics
             g_ClientWidth = std::max(1, width);
             g_ClientHeight = std::max(1, height);
 
-            g_Viewport = CD3DX12_VIEWPORT{ 0.0f, 0.0f, static_cast<float>(g_ClientWidth), static_cast<float>(g_ClientHeight) };
-            g_ScissorRect = CD3DX12_RECT{ 0, 0, static_cast<LONG>(g_ClientWidth), static_cast<LONG>(g_ClientHeight) };
-
             // Flush the GPU queue to make sure the swap chain's back buffers
             // are not being referenced by an in-flight command list.
-            Flush(g_CommandQueue, g_Fence, g_FenceValue, g_FenceEvent);
-
+            Flush();
+            
+            UINT currentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
             for (int i = 0; i < g_NumFrames; ++i) {
                 // Any references to the back buffers must be released
                 // before the swap chain can be resized.
                 g_BackBuffers[i].Reset();
-                g_FrameFenceValues[i] = g_FrameFenceValues[g_CurrentBackBufferIndex];
+                g_FrameFenceValues[i] = g_FrameFenceValues[currentBackBufferIndex];
             }
 
             DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
             ThrowIfFailed(g_SwapChain->GetDesc(&swapChainDesc));
             ThrowIfFailed(g_SwapChain->ResizeBuffers(g_NumFrames, g_ClientWidth, g_ClientHeight, swapChainDesc.BufferDesc.Format, swapChainDesc.Flags));
 
-            g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
-
-            UpdateRenderTargetViews(g_Device, g_SwapChain, g_RTVDescriptorHeap);
+            UpdateRenderTargetViews();
         }
     
     }
 
+    void Present(ComPtr<ID3D12GraphicsCommandList> commandList)
+    {
+        g_FrameFenceValues[g_CurrentBackBufferIndex] = Signal(g_CommandQueue, g_Fence, g_FenceValue);
+
+        UINT syncInterval = g_Vsync ? 1 : 0;
+        UINT presentFlags = g_AllowTearing && !g_Vsync ? DXGI_PRESENT_ALLOW_TEARING : 0;
+        ThrowIfFailed(g_SwapChain->Present(syncInterval, presentFlags));
+
+        g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
+
+        WaitForFenceValue(g_Fence, g_FrameFenceValues[g_CurrentBackBufferIndex], g_FenceEvent);
+    
+    }
+
+    void AcquireBackbuffer(ComPtr<ID3D12GraphicsCommandList> commandList)
+    {
+        WaitForFenceValue(g_Fence, g_FrameFenceValues[g_SwapChain->GetCurrentBackBufferIndex()], g_FenceEvent);
+        auto backBuffer = g_BackBuffers[g_CurrentBackBufferIndex];
+
+        CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+        commandList->ResourceBarrier(1, &barrier);
+    }
+
+    void ReleaseBackbuffer(ComPtr<ID3D12GraphicsCommandList> commandList)
+    {
+        auto backBuffer = g_BackBuffers[g_CurrentBackBufferIndex];
+        CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+        commandList->ResourceBarrier(1, &barrier);
+    }
+
+    void ClearCurrentBackbuffer(ComPtr<ID3D12GraphicsCommandList> commandList, FLOAT *color)
+    {
+        CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(g_RTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), g_CurrentBackBufferIndex, g_RTVDescriptorSize);
+        commandList->ClearRenderTargetView(rtv, color, 0, nullptr);
+    }
+
+
     bool IsSupportTearing()
     {
         return g_IsSupportTearing;
-    
     }
 
-    void GetFreeBackBuffer(ComPtr<ID3D12GraphicsCommandList>)
+    void AllowTearing(bool value)
     {
-    
+        g_AllowTearing = value;
     }
 
-    void PrepareForPresent(ComPtr<ID3D12GraphicsCommandList>)
+    void EnableVsync(bool value)
     {
-    
-    }
-
-    void Present()
-    {
-    
+        g_Vsync = value;
     }
 }

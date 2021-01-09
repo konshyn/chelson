@@ -1,3 +1,3 @@
 #include <cassert>
-#include "Scene.hpp"
+#include "../Scene.hpp"
 
