@@ -11,6 +11,21 @@
 //// D3D12 extension library.
 //#include "d3dx12.hpp"
 
+namespace graphics
+{
+    bool g_EnableDebugLayer;
+    ComPtr<ID3D12Device2> g_Device;
+    ComPtr<IDXGIAdapter4> g_DXGIAdapter4;
+    ComPtr<ID3D12CommandQueue> g_DirectCommandQueue;
+}
+
+namespace
+{
+    ComPtr<ID3D12Fence> g_Fence;
+    HANDLE g_FenceEvent;
+    uint64_t g_CurrentFenceValue{0};
+}
+
 namespace 
 {
 ////////////////////////////////////////
@@ -47,12 +62,12 @@ namespace
     void CreateDevice()
     {
         assert(graphics::g_DXGIAdapter4);
-        ThrowIfFailed(D3D12CreateDevice(graphics::g_DXGIAdapter4.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&g_Device)));
+        ThrowIfFailed(D3D12CreateDevice(graphics::g_DXGIAdapter4.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&graphics::g_Device)));
 
         // Enable debug messages in debug mode.
         if (graphics::g_EnableDebugLayer) {
             ComPtr<ID3D12InfoQueue> pInfoQueue;
-            if (SUCCEEDED(g_Device.As(&pInfoQueue))) {
+            if (SUCCEEDED(graphics::g_Device.As(&pInfoQueue))) {
                 pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
                 pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
                 pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
@@ -113,12 +128,35 @@ namespace graphics
         desc.NodeMask = 0;
 
         ThrowIfFailed(g_Device->CreateCommandQueue(&desc, IID_PPV_ARGS(&g_DirectCommandQueue)));
+
+        g_Fence = CreateFence();
+        g_FenceEvent = CreateEventHandle(L"GlobalFenceEvent");
+        g_CurrentFenceValue = g_Fence->GetCompletedValue();
     }
     
     void RequestExit()
     {
-        Flush(g_CommandQueue, g_Fence, g_FenceValue, g_FenceEvent);
+        WaitForGPU();
+        // TODO clean up
     }
 
+    void WaitForGPU()
+    {
+        WaitForFenceValue(Signal());
+    }
 
+    uint64_t Signal()
+    {
+        g_CurrentFenceValue++;
+        ThrowIfFailed(g_DirectCommandQueue->Signal(g_Fence.Get(), g_CurrentFenceValue));
+        return g_CurrentFenceValue;
+    }
+
+    void WaitForFenceValue(uint64_t fenceValue, std::chrono::milliseconds duration /* = std::chrono::milliseconds::max() */)
+    {
+        if (g_Fence->GetCompletedValue() < fenceValue) {
+            ThrowIfFailed(g_Fence->SetEventOnCompletion(fenceValue, g_FenceEvent));
+            ::WaitForSingleObject(g_FenceEvent, static_cast<DWORD>(duration.count()));
+        }
+    }
 }

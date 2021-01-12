@@ -17,7 +17,5 @@ namespace graphics
         void Render(Scene* scene);
 
     private:
-        ComPtr<ID3D12GraphicsCommandList> g_CommandList;
-        ComPtr<ID3D12CommandAllocator> g_CommandAllocators[g_NumFrames];
     };
 }

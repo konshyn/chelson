@@ -11,7 +11,7 @@
 namespace
 {
     ComPtr<ID3D12GraphicsCommandList> g_CommandList;
-    ComPtr<ID3D12CommandAllocator> g_CommandAllocators[g_NumFrames];
+    ComPtr<ID3D12CommandAllocator> g_CommandAllocators[graphics::g_NumFrames];
 
     ComPtr<ID3D12RootSignature> g_RootSignature;
 
@@ -92,8 +92,6 @@ namespace graphics
     RenderPass::RenderPass(ERenderTechnique, ELightingModel)
     {
         assert(g_Device);
-        ComPtr<ID3D12GraphicsCommandList> g_CommandList;
-        ComPtr<ID3D12CommandAllocator> g_CommandAllocators[g_NumFrames];
 
         for (int i = 0; i < g_NumFrames; ++i) {
             ThrowIfFailed(graphics::g_Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&g_CommandAllocators[i])));
@@ -106,9 +104,9 @@ namespace graphics
         g_Viewport = CD3DX12_VIEWPORT{ 0.0f, 0.0f, static_cast<float>(g_ClientWidth), static_cast<float>(g_ClientHeight) };
         g_ScissorRect = CD3DX12_RECT{ 0, 0, static_cast<LONG>(g_ClientWidth), static_cast<LONG>(g_ClientHeight) };
 
-        CreateRootSignature();
-        LoadShaders();
-        CreatePipelineStateObject();
+        //CreateRootSignature();
+        //LoadShaders();
+        //CreatePipelineStateObject();
     }
 
     void RenderPass::Render(Scene *scene)
@@ -117,48 +115,23 @@ namespace graphics
         commandAllocator->Reset();
         g_CommandList->Reset(commandAllocator.Get(), nullptr);
 
-        AcquireBackbuffer(g_CommandList);
-
-        
-
         // Clear the render target.
         {
-            CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-                backBuffer.Get(),
-                D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-            g_CommandList->ResourceBarrier(1, &barrier);
-
+            AcquireBackbuffer(g_CommandList);
             FLOAT clearColor[] = { 0.4f, 0.6f, 0.9f, 1.0f };
-            CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(g_RTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-                g_CurrentBackBufferIndex, g_RTVDescriptorSize);
-
-            g_CommandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+            ClearCurrentBackbuffer(g_CommandList, clearColor);
         }
 
         // Present
         {
-            CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-                backBuffer.Get(),
-                D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-            g_CommandList->ResourceBarrier(1, &barrier);
+            ReleaseBackbuffer(g_CommandList);
 
             ThrowIfFailed(g_CommandList->Close());
 
             ID3D12CommandList* const commandLists[] = {
                 g_CommandList.Get()
             };
-            g_CommandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
-
-            g_FrameFenceValues[g_CurrentBackBufferIndex] = Signal(g_CommandQueue, g_Fence, g_FenceValue);
-
-            UINT syncInterval = g_VSync ? 1 : 0;
-            UINT presentFlags = g_TearingSupported && !g_VSync ? DXGI_PRESENT_ALLOW_TEARING : 0;
-            ThrowIfFailed(g_SwapChain->Present(syncInterval, presentFlags));
-
-            g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
-
-            WaitForFenceValue(g_Fence, g_FrameFenceValues[g_CurrentBackBufferIndex], g_FenceEvent);
+            g_DirectCommandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
         }
     }
 }

@@ -16,11 +16,14 @@ enum class ERenderTechnique
     ForwardPlus
 };
 
-class Scene;
+struct Scene;
 namespace render
 {
     void InitRender(ERenderTechnique renderTechnique, ELightingModel lightModel);
-    void SetScene(Scene *scene);
+
+    void SetScene(Scene* scene);
+
     void Render();
+
     void RequestExit();
 }

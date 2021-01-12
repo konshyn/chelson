@@ -24,9 +24,12 @@ RawMeshDataSoA LoadTriangleScene()
     mesh.Positions.Stride = sizeof(Vec3);
 
     mesh.PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+    return mesh;
 }
 
 RawMeshDataSoA LoadSponzaScene()
 {
     assert(false);
+    return{};
 }

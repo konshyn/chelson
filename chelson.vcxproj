@@ -99,6 +99,7 @@
     <ClCompile Include="src\GAPI\dx12\ResourceLoader.cpp" />
     <ClCompile Include="src\GAPI\dx12\SwapChain.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Render\Render.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -128,7 +129,6 @@
     <ClInclude Include="src\Helpers.hpp" />
     <ClInclude Include="src\Mathematics\Mathematics.hpp" />
     <ClInclude Include="src\Render.hpp" />
-    <ClInclude Include="src\Render\Render.cpp" />
     <ClInclude Include="src\Scene.hpp" />
     <ClInclude Include="src\Scene\Camera.hpp" />
     <ClInclude Include="src\WindowsIncludes.hpp" />

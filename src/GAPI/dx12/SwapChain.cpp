@@ -1,11 +1,19 @@
+#include "Common.hpp"
 #include <cassert>
 
 #include "../../GraphicsInterlayer.hpp"
-#include "Common.hpp"
-
 #include "../../Helpers.hpp"
 
 #include "d3dx12.hpp"
+
+#include <iostream>
+
+namespace graphics
+{
+    uint32_t g_ClientWidth;
+    uint32_t g_ClientHeight;
+    UINT g_CurrentBackBufferIndex;
+}
 
 namespace
 {
@@ -14,15 +22,14 @@ namespace
     bool g_Vsync{true};
     HWND g_HWND{};
     ComPtr<IDXGISwapChain4> g_SwapChain;
-    ComPtr<ID3D12Resource> g_BackBuffers[g_NumFrames];
+    ComPtr<ID3D12Resource> g_BackBuffers[graphics::g_NumFrames];
     ComPtr<ID3D12DescriptorHeap> g_RTVDescriptorHeap;
     UINT g_RTVDescriptorSize;
 
-    ComPtr<ID3D12Fence> g_Fence;
-    uint64_t g_FenceValue = 0;
-    uint64_t g_FrameFenceValues[g_NumFrames]{};
-    HANDLE g_FenceEvent;
+    uint64_t g_FrameFenceValues[graphics::g_NumFrames]{};
 }
+
+
 
 namespace
 {
@@ -55,11 +62,11 @@ namespace
 
         CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(g_RTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-        for (int i = 0; i < g_NumFrames; ++i) {
+        for (int i = 0; i < graphics::g_NumFrames; ++i) {
             ComPtr<ID3D12Resource> backBuffer;
             ThrowIfFailed(g_SwapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffer)));
 
-            g_Device->CreateRenderTargetView(backBuffer.Get(), nullptr, rtvHandle);
+            graphics::g_Device->CreateRenderTargetView(backBuffer.Get(), nullptr, rtvHandle);
 
             g_BackBuffers[i] = backBuffer;
 
@@ -67,10 +74,13 @@ namespace
         }
     }
 
-    void Flush(ComPtr<ID3D12CommandQueue> commandQueue, ComPtr<ID3D12Fence> fence, uint64_t& fenceValue, HANDLE fenceEvent)
+    void MoveToNextFrame()
     {
-        uint64_t fenceValueForSignal = Signal(commandQueue, fence, fenceValue);
-        WaitForFenceValue(fence, fenceValueForSignal, fenceEvent);
+        const UINT64 currentFenceValue = g_FrameFenceValues[graphics::g_CurrentBackBufferIndex];
+        wchar_t buffer[500];
+        //swprintf_s(buffer, 500, L"wait value =  %d\n", currentFenceValue);
+        //OutputDebugString(buffer);
+        graphics::WaitForFenceValue(currentFenceValue);
     }
 }
 
@@ -133,8 +143,9 @@ namespace graphics
 
         UpdateRenderTargetViews();
 
-        g_Fence = CreateFence();
-        g_FenceEvent = CreateEventHandle(L"SwapChainEvent");
+        graphics::WaitForGPU();
+
+        g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
     }
 
     void ResizeSwapChain(int width, int height)
@@ -146,42 +157,43 @@ namespace graphics
 
             // Flush the GPU queue to make sure the swap chain's back buffers
             // are not being referenced by an in-flight command list.
-            Flush();
-            
-            UINT currentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
+            WaitForGPU();
+
             for (int i = 0; i < g_NumFrames; ++i) {
                 // Any references to the back buffers must be released
                 // before the swap chain can be resized.
                 g_BackBuffers[i].Reset();
-                g_FrameFenceValues[i] = g_FrameFenceValues[currentBackBufferIndex];
+                g_FrameFenceValues[i] = g_FrameFenceValues[g_CurrentBackBufferIndex];
             }
 
             DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
             ThrowIfFailed(g_SwapChain->GetDesc(&swapChainDesc));
             ThrowIfFailed(g_SwapChain->ResizeBuffers(g_NumFrames, g_ClientWidth, g_ClientHeight, swapChainDesc.BufferDesc.Format, swapChainDesc.Flags));
 
+            g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
             UpdateRenderTargetViews();
         }
     
     }
 
-    void Present(ComPtr<ID3D12GraphicsCommandList> commandList)
+    void Present()
     {
-        g_FrameFenceValues[g_CurrentBackBufferIndex] = Signal(g_CommandQueue, g_Fence, g_FenceValue);
-
         UINT syncInterval = g_Vsync ? 1 : 0;
         UINT presentFlags = g_AllowTearing && !g_Vsync ? DXGI_PRESENT_ALLOW_TEARING : 0;
         ThrowIfFailed(g_SwapChain->Present(syncInterval, presentFlags));
 
-        g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
+        g_FrameFenceValues[g_CurrentBackBufferIndex] = Signal();
+        wchar_t buffer[500];
+        //swprintf_s(buffer, 500, L"fence value =  %d\n", g_FrameFenceValues[g_CurrentBackBufferIndex]);
+        //OutputDebugString(buffer);
 
-        WaitForFenceValue(g_Fence, g_FrameFenceValues[g_CurrentBackBufferIndex], g_FenceEvent);
-    
+        g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
+        MoveToNextFrame();
     }
 
     void AcquireBackbuffer(ComPtr<ID3D12GraphicsCommandList> commandList)
     {
-        WaitForFenceValue(g_Fence, g_FrameFenceValues[g_SwapChain->GetCurrentBackBufferIndex()], g_FenceEvent);
+        
         auto backBuffer = g_BackBuffers[g_CurrentBackBufferIndex];
 
         CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);

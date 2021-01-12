@@ -2,9 +2,7 @@
 
 #include <cassert>
 
-#include "../GraphicsAPI.hpp"
-#include "../BulkDataContainer.hpp"
-#include ""
+#include "../../GraphicsInterlayer.hpp"
 
 namespace
 {
@@ -24,10 +22,6 @@ namespace
     {
     
     };
-
-    BulkDataContainer<VertexBuffer> g_VertexBuffers;
-    BulkDataContainer<IndexBuffer> g_IndexBuffers;
-    BulkDataContainer<RenderItem> g_RenderItems;
 }
 
 namespace graphics
@@ -35,25 +29,24 @@ namespace graphics
     // creating resources
     VertexBufferID CreateVertexBuffer(const uint8_t* data, size_t sizeInBytes, size_t strideInBytes)
     {
-        
-        g_VertexBufferView.BufferLocation = g_VertexBuffer->GetGPUVirtualAddress();
-        g_VertexBufferView.StrideInBytes = sizeof(DirectX::XMFLOAT3);
-        g_VertexBufferView.SizeInBytes = vertexBufferSize;
-    
+        assert(false);
+        return {};
     }
 
     IndexBufferID CreateIndexBuffer(const uint8_t* data, size_t numIndicies, DXGI_FORMAT indexFormat)
     {
-
+        assert(false);
+        return {};
     }
 
     uint32_t CreateRenderItem(VertexPositionDesc& desc)
     {
-
+        assert(false);
+        return {};
     }
 
-    uint32_t CreateRenderItem(VertexPositionTextureDesc& desc) { assert(false); }
-    uint32_t CreateRenderItem(VertexPositionNormalDesc& desc) { assert(false); }
-    uint32_t CreateRenderItem(VertexPositionTextureNormalDesc& desc) { assert(false); }
-    uint32_t CreateRenderItem(VertexPositionTextureNormalTangentBitangentDesc& desc) { assert(false); }
+    uint32_t CreateRenderItem(VertexPositionTextureDesc& desc) { assert(false); return{};}
+    uint32_t CreateRenderItem(VertexPositionNormalDesc& desc) { assert(false);  return{};}
+    uint32_t CreateRenderItem(VertexPositionTextureNormalDesc& desc) { assert(false);  return{};}
+    uint32_t CreateRenderItem(VertexPositionTextureNormalTangentBitangentDesc& desc) { assert(false); return{};}
 }

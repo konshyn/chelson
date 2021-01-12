@@ -7,9 +7,11 @@
 
 #include <memory>
 
+#include <iostream>
+
 namespace 
 {
-    std::unique_ptr<RenderPass> g_RenderPass;
+    std::unique_ptr<graphics::RenderPass> g_RenderPass;
     Scene *g_Scene{nullptr};
 }
 
@@ -19,7 +21,7 @@ namespace render
     {
         assert(renderTechnique == ERenderTechnique::Forward);
         assert(lightModel == ELightingModel::Lambertian);
-        g_RenderPass.reset(new RenderPass(renderTechnique, lightModel));
+        g_RenderPass.reset(new graphics::RenderPass(renderTechnique, lightModel));
     }
     
     void SetScene(Scene *scene)
@@ -30,12 +32,17 @@ namespace render
 
     void Render()
     {
+        static int i = 0;
+        ++i;
+        wchar_t buffer[500];
+        //swprintf_s(buffer, 500, L"i = %d\n", i);
+        //OutputDebugString(buffer);
         g_RenderPass->Render(g_Scene);
+        graphics::Present();
     }
 
     void RequestExit()
     {
         SetScene(nullptr);
     }
-
 }

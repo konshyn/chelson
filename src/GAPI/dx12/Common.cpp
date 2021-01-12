@@ -25,20 +25,4 @@ namespace graphics
 
         return fenceEvent;
     }
-
-    uint64_t Signal(ComPtr<ID3D12Fence> fence, uint64_t &fenceValue)
-    {
-        uint64_t fenceValueForSignal = ++fenceValue;
-        ThrowIfFailed(g_DirectCommandQueue->Signal(fence.Get(), fenceValueForSignal));
-
-        return fenceValueForSignal;
-    }
-
-    void WaitForFenceValue(ComPtr<ID3D12Fence> fence, uint64_t fenceValue, HANDLE fenceEvent, std::chrono::milliseconds duration /* = std::chrono::milliseconds::max() */)
-    {
-        if (fence->GetCompletedValue() < fenceValue) {
-            ThrowIfFailed(fence->SetEventOnCompletion(fenceValue, fenceEvent));
-            ::WaitForSingleObject(fenceEvent, static_cast<DWORD>(duration.count()));
-        }
-    }
 }
