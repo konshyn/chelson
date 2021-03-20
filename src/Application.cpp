@@ -3,7 +3,8 @@
 #include <chrono>
 
 #include "Application.hpp"
-#include "GraphicsAPI.hpp"
+#include "GraphicsInterlayer.hpp"
+#include "Render.hpp"
 
 LRESULT CALLBACK Application::WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -130,10 +131,14 @@ bool Application::Initialize(HINSTANCE hInstance)
     CreateWindow(hInstance);
     assert(m_hwnd && "Failed to create window");
 
-    graphics::Initialize(true);
-    graphics::CreateSwapChain(m_hwnd, m_windowWidth, m_windowHeight);
+    graphics::InitGraphicsInterlayer(true);
+    graphics::InitSwapChain(m_hwnd, m_windowWidth, m_windowHeight);
+    graphics::EnableVsync(m_vsync);
 
-    FillTriangleScene(scene);
+    //FillTriangleScene(scene);
+
+    render::InitRender(ERenderTechnique::Default, ELightingModel::Default);
+    render::SetScene(&m_scene);
 
     m_isInitialize = result;
 
@@ -159,7 +164,7 @@ void Application::Run()
         }
 
         Update();
-        graphics::Render(&scene);
+        render::Render();
     }
 
     graphics::RequestExit();
@@ -193,6 +198,7 @@ void Application::Update()
 void Application::SetVSync(bool vsync)
 {
     m_vsync = vsync;
+    graphics::EnableVsync(m_vsync);
 }
 
 bool Application::IsVSync()
@@ -203,6 +209,7 @@ bool Application::IsVSync()
 void Application::ToggleVSync()
 {
     m_vsync = !m_vsync;
+    graphics::EnableVsync(m_vsync);
 }
 
 void Application::SetFullscreen(bool fullscreen)
@@ -266,7 +273,7 @@ void Application::ToggleFullscreen()
 
 void Application::ToggleTearing()
 {
-    if (IsSupportTearing()) {
+    if (graphics::IsSupportTearing()) {
         m_allowTearing = !m_allowTearing;
     }
 }

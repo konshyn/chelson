@@ -15,29 +15,8 @@
     </ClCompile>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\GAPI\dx12\DirectX12.cpp">
-      <Filter>GAPI\dx12</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GAPI\dx12\ResourceLoader.cpp">
-      <Filter>GAPI\dx12</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GAPI\dx12\SwapChain.cpp">
-      <Filter>GAPI\dx12</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\Scene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AssetLoader\PreparedMeshLoader.cpp">
-      <Filter>AssetLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AssetLoader\PreparedSceneLoader.cpp">
-      <Filter>AssetLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GAPI\dx12\Common.cpp">
-      <Filter>GAPI\dx12</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GAPI\dx12\RenderPass.cpp">
-      <Filter>GAPI\dx12</Filter>
+    <ClCompile Include="src\ResourceManager\ResourceManager.cpp">
+      <Filter>ResourceManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -87,35 +66,16 @@
       <Filter>External\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="src\Application.hpp" />
-    <ClInclude Include="src\AssetLoader.hpp" />
-    <ClInclude Include="src\GraphicsInterlayer.hpp" />
     <ClInclude Include="src\Helpers.hpp" />
-    <ClInclude Include="src\Scene.hpp" />
     <ClInclude Include="src\WindowsIncludes.hpp" />
-    <ClInclude Include="src\Mathematics\Mathematics.hpp">
-      <Filter>Mathematics</Filter>
+    <ClInclude Include="src\ResourceManager\ResourceManager.hpp">
+      <Filter>ResourceManager</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Camera.hpp">
-      <Filter>Scene</Filter>
+    <ClInclude Include="src\ResourceManager\ResourceType.hpp">
+      <Filter>ResourceManager</Filter>
     </ClInclude>
-    <ClInclude Include="src\Render\Render.cpp">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Render.hpp" />
-    <ClInclude Include="src\Containers\Bulk.hpp">
-      <Filter>Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AssetLoader\AssetTypes.hpp">
-      <Filter>AssetLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GAPI\dx12\d3dx12.hpp">
-      <Filter>GAPI\dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GAPI\dx12\Common.hpp">
-      <Filter>GAPI\dx12</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GAPI\dx12\RenderPass.hpp">
-      <Filter>GAPI\dx12</Filter>
+    <ClInclude Include="external\ObjLoader\OBJ_Loader.h">
+      <Filter>External\ObjLoader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -128,29 +88,11 @@
     <Filter Include="External\Imgui">
       <UniqueIdentifier>{5686987b-ca55-4a13-aea5-0e3ba22dcacc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AssetLoader">
-      <UniqueIdentifier>{2e37ca68-4fae-4749-b133-233692d809fa}</UniqueIdentifier>
+    <Filter Include="ResourceManager">
+      <UniqueIdentifier>{7ef9786b-bbfb-44cc-939a-5974815a1c06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Containers">
-      <UniqueIdentifier>{e9b426cb-477e-41a0-9f17-98932db0e2c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GAPI">
-      <UniqueIdentifier>{2ecaac80-5e00-41d6-af00-468006272edb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GAPI\dx12">
-      <UniqueIdentifier>{b9c140fb-8e8f-41e7-b864-b3afe4a39fb6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Renderer">
-      <UniqueIdentifier>{3be04cf0-3103-45dc-a8f3-c4f5d55acf27}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Mathematics">
-      <UniqueIdentifier>{813e9046-e4a0-41b9-9e98-2cdbafbffba6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scene">
-      <UniqueIdentifier>{e4ee85e8-e46c-4111-90b1-abe46032d020}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GAPI\dx12\Shaders">
-      <UniqueIdentifier>{b613767d-35ea-45d5-b4f4-0384d57474ba}</UniqueIdentifier>
+    <Filter Include="External\ObjLoader">
+      <UniqueIdentifier>{dfcfb50f-dbb8-4d4e-ac48-007b12517d84}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -171,9 +113,6 @@
     </None>
     <None Include="external\DirectXMath\DirectXPackedVector.inl">
       <Filter>External\DirectXMath</Filter>
-    </None>
-    <None Include="src\GAPI\dx12\Shaders\flat_color.hlsl">
-      <Filter>GAPI\dx12\Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

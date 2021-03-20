@@ -23,9 +23,9 @@ private:
     uint32_t m_windowWidth{};
     uint32_t m_windowHeight{};
 
-    Scene scene;
+    Scene m_scene;
 
-    bool m_vsync{ true };
+    bool m_vsync{ false };
     bool m_allowTearing{ false };
     bool m_fullscreen{ false };
 
