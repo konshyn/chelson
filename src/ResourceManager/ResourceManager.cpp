@@ -1,7 +1,7 @@
 #include "ResourceManager.hpp"
 
 #define TINYOBJLOADER_IMPLEMENTATION
-#include <external/ObjLoader/OBJ_Loader.h>
+#include <external/ObjLoader/ObjLoader.h>
 
 using namespace Resources::CPU;
 

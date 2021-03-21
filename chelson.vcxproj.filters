@@ -1,133 +1,215 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="external\DirectXMath\DirectXSH.cpp">
-      <Filter>External\DirectXMath</Filter>
-    </ClCompile>
-    <ClCompile Include="external\DirectXMath\DirectXSHD3D11.cpp">
-      <Filter>External\DirectXMath</Filter>
-    </ClCompile>
-    <ClCompile Include="external\DirectXMath\DirectXSHD3D12.cpp">
-      <Filter>External\DirectXMath</Filter>
-    </ClCompile>
-    <ClCompile Include="external\DirectXMath\Stereo3DMatrixHelper.cpp">
-      <Filter>External\DirectXMath</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\ResourceManager\ResourceManager.cpp">
-      <Filter>ResourceManager</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Render\Render.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
+    <Filter Include="external">
+      <UniqueIdentifier>{399db16a-c854-4513-9af2-d2ae90e58283}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\ObjLoader">
+      <UniqueIdentifier>{383f6061-2649-4813-85ca-b8822334d30a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\DirectXMath">
+      <UniqueIdentifier>{f604117a-838c-435a-812b-3f84bd29d3d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\tinyobjloader">
+      <UniqueIdentifier>{0eb6d3c9-c0da-450e-ae8e-765f07681829}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{774cfe52-d72a-48df-b118-fed69d31b906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor">
+      <UniqueIdentifier>{1ec6659c-c12b-48b5-9888-797ce22116b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers">
+      <UniqueIdentifier>{d91ec876-2b02-42e0-b306-4b27607eb60b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ResourceManager">
+      <UniqueIdentifier>{12d3ee0f-e520-4b6f-8853-e6452029644b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\imgui">
+      <UniqueIdentifier>{6a6037b6-b717-4657-8ca2-ce45eb408888}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor\imgui">
+      <UniqueIdentifier>{2a2cb7fa-1712-4b00-8972-f676d2307480}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\DirectXMath\DirectXCollision.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXColors.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMath.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathAVX.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathAVX2.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathBE.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathF16C.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathFMA3.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathFMA4.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathSSE3.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXMathSSE4.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXPackedVector.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\DirectXSH.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\Stereo3DMatrixHelper.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
     <ClInclude Include="external\DirectXMath\XDSP.h">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </ClInclude>
-    <ClInclude Include="src\Application.hpp" />
-    <ClInclude Include="src\Helpers.hpp" />
-    <ClInclude Include="src\WindowsIncludes.hpp" />
-<<<<<<< HEAD
+    <ClInclude Include="external\tinyobjloader\tiny_obj_loader.h">
+      <Filter>external\tinyobjloader</Filter>
+    </ClInclude>
+    <ClInclude Include="external\ObjLoader\ObjLoader.h">
+      <Filter>external\ObjLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Helpers\Helpers.hpp">
+      <Filter>Helpers</Filter>
+    </ClInclude>
     <ClInclude Include="src\ResourceManager\ResourceManager.hpp">
       <Filter>ResourceManager</Filter>
-=======
-    <ClInclude Include="src\Mathematics\Mathematics.hpp">
-      <Filter>Mathematics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\Camera.hpp">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Render.hpp" />
-    <ClInclude Include="src\Containers\Bulk.hpp">
-      <Filter>Containers</Filter>
->>>>>>> e8fab5bc6cdd3b251872c10a1ac17f7c2721e5b2
     </ClInclude>
     <ClInclude Include="src\ResourceManager\ResourceType.hpp">
       <Filter>ResourceManager</Filter>
     </ClInclude>
-    <ClInclude Include="external\ObjLoader\OBJ_Loader.h">
-      <Filter>External\ObjLoader</Filter>
+    <ClInclude Include="external\imgui\imconfig.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="external\imgui\imgui.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="external\imgui\imgui_internal.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="external\imgui\imstb_rectpack.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="external\imgui\imstb_textedit.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="external\imgui\imstb_truetype.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Editor\imgui\imgui_impl_dx12.h">
+      <Filter>Editor\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Editor\imgui\imgui_impl_win32.h">
+      <Filter>Editor\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\DX12Subsystem.hpp">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Win32Includes.hpp">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\EventSubsystem.hpp">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\Win32System.hpp">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Editor\Application.hpp">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\IApplication.hpp">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\d3dx12.h">
+      <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="External">
-      <UniqueIdentifier>{82306866-6d34-4c89-81df-a53682abcdb6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\DirectXMath">
-      <UniqueIdentifier>{3f928ccf-7018-44a1-9f1c-032593d56952}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\Imgui">
-      <UniqueIdentifier>{5686987b-ca55-4a13-aea5-0e3ba22dcacc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ResourceManager">
-      <UniqueIdentifier>{7ef9786b-bbfb-44cc-939a-5974815a1c06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\ObjLoader">
-      <UniqueIdentifier>{dfcfb50f-dbb8-4d4e-ac48-007b12517d84}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="external\DirectXMath\DirectXCollision.inl">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </None>
     <None Include="external\DirectXMath\DirectXMathConvert.inl">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </None>
     <None Include="external\DirectXMath\DirectXMathMatrix.inl">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </None>
     <None Include="external\DirectXMath\DirectXMathMisc.inl">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </None>
     <None Include="external\DirectXMath\DirectXMathVector.inl">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </None>
     <None Include="external\DirectXMath\DirectXPackedVector.inl">
-      <Filter>External\DirectXMath</Filter>
+      <Filter>external\DirectXMath</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="external\DirectXMath\DirectXSH.cpp">
+      <Filter>external\DirectXMath</Filter>
+    </ClCompile>
+    <ClCompile Include="external\DirectXMath\DirectXSHD3D11.cpp">
+      <Filter>external\DirectXMath</Filter>
+    </ClCompile>
+    <ClCompile Include="external\DirectXMath\DirectXSHD3D12.cpp">
+      <Filter>external\DirectXMath</Filter>
+    </ClCompile>
+    <ClCompile Include="external\DirectXMath\Stereo3DMatrixHelper.cpp">
+      <Filter>external\DirectXMath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Editor\Main.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResourceManager\ResourceManager.cpp">
+      <Filter>ResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="external\imgui\imgui.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="external\imgui\imgui_demo.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="external\imgui\imgui_draw.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="external\imgui\imgui_tables.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="external\imgui\imgui_widgets.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Editor\imgui\imgui_impl_dx12.cpp">
+      <Filter>Editor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Editor\imgui\imgui_impl_win32.cpp">
+      <Filter>Editor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\DX12Subsystem.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\EventSubsystem.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\Win32System.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Editor\Application.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
