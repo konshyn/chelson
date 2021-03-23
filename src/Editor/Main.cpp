@@ -1,5 +1,6 @@
 #include <Common/Win32System.hpp>
-#include "Application.hpp"
+#include "Editor.hpp"
+#include <Common/ApplicationSettings.hpp>
 
 int WINAPI wWinMain(
     _In_ HINSTANCE hInstance,
@@ -12,9 +13,9 @@ int WINAPI wWinMain(
 
     Win32OS::Win32System win32;
     Win32OS::DescWin32 desc;
-    Application app;
+    Editor app;
     
-    desc.DX12SubsystemDebug = true;
+    NeedGraphicsDebugLayer_global = true;
     desc.hInst = hInstance;
     desc.windowTitle = L"Chelson Editor";
 

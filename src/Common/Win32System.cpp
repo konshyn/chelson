@@ -1,5 +1,6 @@
 #include "Win32System.hpp"
 #include "IApplication.hpp"
+#include "ApplicationSettings.hpp"
 
 #include <Helpers/Helpers.hpp>
 
@@ -30,10 +31,6 @@ namespace Win32OS
         }
 
         if (!initDX12Subsystem(desc)) {
-            return false;
-        }
-
-        if (!createSwapChain()) {
             return false;
         }
 
@@ -152,8 +149,8 @@ namespace Win32OS
 
         ComPtr<IDXGISwapChain1> swapChain1;
         ThrowIfFailed(dxgiFactory4->CreateSwapChainForHwnd(
-            g_DirectCommandQueue.Get(),
-            g_HWND,
+            m_dx12.GetDirectCommandQueue().Get(),
+            m_hwnd,
             &swapChainDesc,
             nullptr,
             nullptr,
@@ -161,13 +158,13 @@ namespace Win32OS
 
         // Disable the Alt+Enter fullscreen toggle feature. Switching to fullscreen
         // will be handled manually.
-        ThrowIfFailed(dxgiFactory4->MakeWindowAssociation(g_HWND, DXGI_MWA_NO_ALT_ENTER));
+        ThrowIfFailed(dxgiFactory4->MakeWindowAssociation(m_hwnd, DXGI_MWA_NO_ALT_ENTER));
 
         ThrowIfFailed(swapChain1.As(&g_SwapChain));
 
         // Create Descriptor Heap
         D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-        desc.NumDescriptors = g_NumFrames;
+        desc.NumDescriptors = NUM_FRAMES;
         desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 
         ThrowIfFailed(g_Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&g_RTVDescriptorHeap)));
@@ -240,7 +237,7 @@ namespace Win32OS
 
     bool Win32System::initDX12Subsystem(DescWin32& desc)
     {
-        if (!m_dx12.Init(desc.DX12SubsystemDebug)) {
+        if (!m_dx12.Init()) {
             return false;
         }
 

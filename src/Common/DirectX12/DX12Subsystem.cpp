@@ -1,6 +1,8 @@
 #include <Helpers/Helpers.hpp>
+#include <Common/ApplicationSettings.hpp>
 
 #include "DX12Subsystem.hpp"
+
 
 namespace DX12S
 {
@@ -12,18 +14,17 @@ namespace DX12S
 
     void DX12Subsystem::createAdapter()
     {
-        ComPtr<IDXGIFactory4> dxgiFactory;
         UINT createFactoryFlags = 0;
-        if (m_enableGDL) {
+        if (NeedGraphicsDebugLayer_global) {
             createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
         }
 
-        ThrowIfFailed(CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory)));
+        ThrowIfFailed(CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&m_dxgiFactory)));
 
         ComPtr<IDXGIAdapter1> dxgiAdapter1;
 
         SIZE_T maxDedicatedVideoMemory = 0;
-        for (UINT i = 0; dxgiFactory->EnumAdapters1(i, &dxgiAdapter1) != DXGI_ERROR_NOT_FOUND; ++i) {
+        for (UINT i = 0; m_dxgiFactory->EnumAdapters1(i, &dxgiAdapter1) != DXGI_ERROR_NOT_FOUND; ++i) {
             DXGI_ADAPTER_DESC1 dxgiAdapterDesc1;
             dxgiAdapter1->GetDesc1(&dxgiAdapterDesc1);
 
@@ -35,17 +36,17 @@ namespace DX12S
                 dxgiAdapterDesc1.DedicatedVideoMemory > maxDedicatedVideoMemory)
             {
                 maxDedicatedVideoMemory = dxgiAdapterDesc1.DedicatedVideoMemory;
-                ThrowIfFailed(dxgiAdapter1.As(&m_DXGIAdapter4));
+                ThrowIfFailed(dxgiAdapter1.As(&m_dxgiAdapter4));
             }
         }
     }
 
     void DX12Subsystem::createDevice()
     {
-        ThrowIfFailed(D3D12CreateDevice(m_DXGIAdapter4.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_device)));
+        ThrowIfFailed(D3D12CreateDevice(m_dxgiAdapter4.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_device)));
 
         // Enable debug messages in debug mode.
-        if (m_enableGDL) {
+        if (NeedGraphicsDebugLayer_global) {
             ComPtr<ID3D12InfoQueue> pInfoQueue;
             if (SUCCEEDED(m_device.As(&pInfoQueue))) {
                 pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
@@ -87,21 +88,39 @@ namespace DX12S
         debugInterface->EnableDebugLayer();
     }
 
-    bool DX12Subsystem::Init(bool isDebug)
+    bool DX12Subsystem::Init()
     {
-        if (isDebug) {
-            m_enableGDL = isDebug;
+        if (NeedGraphicsDebugLayer_global) {
             enableGDL();
         }    
 
         createAdapter();
         createDevice();
 
+        m_isInitialized = true;
+
         return true;
     }
 
     bool DX12Subsystem::Finish()
     {
+        assert(m_isInitialized);
         return true;
     }
+
+    // API
+    ComPtr<ID3D12CommandQueue> & DX12Subsystem::GetDirectCommandQueue()
+    {
+        assert(m_isInitialized);
+        if (!m_directCommandQueue) {
+            D3D12_COMMAND_QUEUE_DESC desc;
+            desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+            desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+            m_device->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_directCommandQueue));
+        }
+
+        return m_directCommandQueue;
+    }
+
+    ComPtr<IDXGISwapChain> & 
 };

@@ -2,17 +2,19 @@
 
 #include <Common/IApplication.hpp>
 
-class Application final: public IApplication
+class Editor final: public IApplication
 {
 // public API
 public:
-    Application();
-    ~Application();
+    Editor();
+    ~Editor();
 
     bool Init(Systems systems) override;
     bool Finish() override;
     void Update() override;
     void WindowSizeChanged() override;
+private:
+    bool createSwapChain();
 
 private:
     Systems m_systems;

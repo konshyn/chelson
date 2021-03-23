@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Win32Includes.hpp"
-#include "DX12Subsystem.hpp"
+#include "DirectX12/DX12Subsystem.hpp"
 #include "EventSubsystem.hpp"
 
 class IApplication;
@@ -11,7 +11,6 @@ namespace Win32OS
     {
         HINSTANCE hInst;
         const wchar_t *windowTitle{nullptr};
-        bool DX12SubsystemDebug{true};
     };
 
     class Win32System 
@@ -33,7 +32,6 @@ namespace Win32OS
         
     private:
         bool createWindow(DescWin32 &desc);
-        bool createSwapChain(DescWin32 &desc);
         bool checkTearingSupport();
         bool initDX12Subsystem(DescWin32 &desc);
         bool initEventSubsystem(DescWin32 &desc);

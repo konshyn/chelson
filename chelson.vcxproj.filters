@@ -31,6 +31,9 @@
     <Filter Include="Editor\imgui">
       <UniqueIdentifier>{2a2cb7fa-1712-4b00-8972-f676d2307480}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Common\DirectX12">
+      <UniqueIdentifier>{db4c0fe2-0078-4406-b902-dd0320841be3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\DirectXMath\DirectXCollision.h">
@@ -117,9 +120,6 @@
     <ClInclude Include="src\Editor\imgui\imgui_impl_win32.h">
       <Filter>Editor\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\DX12Subsystem.hpp">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="src\Common\Win32Includes.hpp">
       <Filter>Common</Filter>
     </ClInclude>
@@ -129,13 +129,19 @@
     <ClInclude Include="src\Common\Win32System.hpp">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="src\Editor\Application.hpp">
+    <ClInclude Include="src\Editor\Editor.hpp">
       <Filter>Editor</Filter>
     </ClInclude>
     <ClInclude Include="src\Common\IApplication.hpp">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\d3dx12.h">
+    <ClInclude Include="src\Common\DirectX12\d3dx12.h">
+      <Filter>Common\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\DirectX12\DX12Subsystem.hpp">
+      <Filter>Common\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\ApplicationSettings.hpp">
       <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
@@ -199,17 +205,20 @@
     <ClCompile Include="src\Editor\imgui\imgui_impl_win32.cpp">
       <Filter>Editor\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\DX12Subsystem.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
     <ClCompile Include="src\Common\EventSubsystem.cpp">
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="src\Common\Win32System.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="src\Editor\Application.cpp">
+    <ClCompile Include="src\Editor\Editor.cpp">
       <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\DirectX12\DX12Subsystem.cpp">
+      <Filter>Common\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\ApplicationSettings.cpp">
+      <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
