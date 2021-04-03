@@ -34,9 +34,11 @@
     <ClInclude Include="external\imgui\imstb_truetype.h" />
     <ClInclude Include="external\ObjLoader\ObjLoader.h" />
     <ClInclude Include="external\tinyobjloader\tiny_obj_loader.h" />
-    <ClInclude Include="src\Common\ApplicationSettings.hpp" />
+    <ClInclude Include="src\Common\ConfigVars.hpp" />
     <ClInclude Include="src\Common\DirectX12\d3dx12.h" />
     <ClInclude Include="src\Common\DirectX12\DX12Subsystem.hpp" />
+    <ClInclude Include="src\Common\DirectX12\RenderTarget.hpp" />
+    <ClInclude Include="src\Common\DirectX12\SwapChain.hpp" />
     <ClInclude Include="src\Common\EventSubsystem.hpp" />
     <ClInclude Include="src\Common\IApplication.hpp" />
     <ClInclude Include="src\Common\Win32System.hpp" />
@@ -66,8 +68,10 @@
     <ClCompile Include="external\imgui\imgui_draw.cpp" />
     <ClCompile Include="external\imgui\imgui_tables.cpp" />
     <ClCompile Include="external\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Common\ApplicationSettings.cpp" />
+    <ClCompile Include="src\Common\ConfigVars.cpp" />
     <ClCompile Include="src\Common\DirectX12\DX12Subsystem.cpp" />
+    <ClCompile Include="src\Common\DirectX12\RenderTarget.cpp" />
+    <ClCompile Include="src\Common\DirectX12\SwapChain.cpp" />
     <ClCompile Include="src\Common\EventSubsystem.cpp" />
     <ClCompile Include="src\Common\Win32System.cpp" />
     <ClCompile Include="src\Editor\Editor.cpp" />

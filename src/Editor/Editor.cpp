@@ -16,6 +16,8 @@ Editor::~Editor()
 bool Editor::Init(Systems systems)
 {
     m_systems = std::move(systems);
+    m_systems.dx12->CreateSwapChain();
+
 
     return true;
 }

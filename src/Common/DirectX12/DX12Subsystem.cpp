@@ -1,8 +1,9 @@
 #include <Helpers/Helpers.hpp>
-#include <Common/ApplicationSettings.hpp>
+#include <Common/ConfigVars.hpp>
 
 #include "DX12Subsystem.hpp"
 
+static constexpr size_t NUM_BACKBUFFERS = 3;
 
 namespace DX12S
 {
@@ -15,7 +16,7 @@ namespace DX12S
     void DX12Subsystem::createAdapter()
     {
         UINT createFactoryFlags = 0;
-        if (NeedGraphicsDebugLayer_global) {
+        if (CVar::NeedGraphicsDebugLayer) {
             createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
         }
 
@@ -46,7 +47,7 @@ namespace DX12S
         ThrowIfFailed(D3D12CreateDevice(m_dxgiAdapter4.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_device)));
 
         // Enable debug messages in debug mode.
-        if (NeedGraphicsDebugLayer_global) {
+        if (CVar::NeedGraphicsDebugLayer) {
             ComPtr<ID3D12InfoQueue> pInfoQueue;
             if (SUCCEEDED(m_device.As(&pInfoQueue))) {
                 pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
@@ -90,9 +91,9 @@ namespace DX12S
 
     bool DX12Subsystem::Init()
     {
-        if (NeedGraphicsDebugLayer_global) {
+        if (CVar::NeedGraphicsDebugLayer) {
             enableGDL();
-        }    
+        }
 
         createAdapter();
         createDevice();
@@ -109,7 +110,7 @@ namespace DX12S
     }
 
     // API
-    ComPtr<ID3D12CommandQueue> & DX12Subsystem::GetDirectCommandQueue()
+    ComPtr<ID3D12CommandQueue>& DX12Subsystem::GetDirectCommandQueue()
     {
         assert(m_isInitialized);
         if (!m_directCommandQueue) {
@@ -122,5 +123,95 @@ namespace DX12S
         return m_directCommandQueue;
     }
 
-    ComPtr<IDXGISwapChain> & 
+    // API
+    ComPtr<ID3D12CommandQueue>& DX12Subsystem::GetComputeCommandQueue()
+    {
+        assert(m_isInitialized);
+        if (!m_computeCommandQueue) {
+            D3D12_COMMAND_QUEUE_DESC desc;
+            desc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+            desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+            m_device->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_computeCommandQueue));
+        }
+
+        return m_computeCommandQueue;
+    }
+
+    bool DX12Subsystem::checkTearingSupport()
+    {
+        BOOL allowTearing = FALSE;
+
+        // Rather than create the DXGI 1.5 factory interface directly, we create the
+        // DXGI 1.4 interface and query for the 1.5 interface. This is to enable the 
+        // graphics debugging tools which will not support the 1.5 factory interface 
+        // until a future update.
+        ComPtr<IDXGIFactory4> factory4;
+        if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory4)))) {
+            ComPtr<IDXGIFactory5> factory5;
+            if (SUCCEEDED(factory4.As(&factory5))) {
+                if (FAILED(factory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing)))) {
+                    allowTearing = FALSE;
+                }
+            }
+        }
+
+        return allowTearing == TRUE;
+    }
+
+    void DX12Subsystem::CreateSwapChain(HWND hwnd, UINT width, UINT height)
+    {
+        m_isTearingSupport = checkTearingSupport();
+
+        ComPtr<IDXGIFactory4> dxgiFactory4;
+        UINT createFactoryFlags = 0;
+
+        if (CVar::NeedGraphicsDebugLayer) {
+            createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
+        }
+
+        ThrowIfFailed(CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory4)));
+
+        DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+        swapChainDesc.Width = width;
+        swapChainDesc.Height = height;
+        swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        swapChainDesc.Stereo = FALSE;
+        swapChainDesc.SampleDesc = { 1, 0 };
+        swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        swapChainDesc.BufferCount = NUM_BACKBUFFERS;
+        swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+        swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+        swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+        // It is recommended to always allow tearing if tearing support is available.
+        swapChainDesc.Flags = m_isTearingSupport ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
+
+        
+        ThrowIfFailed(dxgiFactory4->CreateSwapChainForHwnd(
+            m_directCommandQueue.Get(),
+            hwnd,
+            &swapChainDesc,
+            nullptr,
+            nullptr,
+            &m_swapChain1));
+
+        // Disable the Alt+Enter fullscreen toggle feature. Switching to fullscreen
+        // will be handled manually.
+        ThrowIfFailed(dxgiFactory4->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER));
+
+        // Create Descriptor Heap
+        D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+        desc.NumDescriptors = NUM_BACKBUFFERS;
+        desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+
+        ThrowIfFailed(m_device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&g_RTVDescriptorHeap)));
+        g_RTVDescriptorSize = g_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+        UpdateRenderTargetViews();
+
+        graphics::WaitForGPU();
+
+        g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
+        return true;
+        
+    }
 };

@@ -26,13 +26,12 @@ namespace Win32OS
         HWND GetHWND();
 
     public:
-        bool IsTearingSupport();
         bool IsFullscreen();
         void GetWindowSize(int &width, int &height);
         
+        
     private:
         bool createWindow(DescWin32 &desc);
-        bool checkTearingSupport();
         bool initDX12Subsystem(DescWin32 &desc);
         bool initEventSubsystem(DescWin32 &desc);
 

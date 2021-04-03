@@ -1,6 +1,6 @@
 #include "Win32System.hpp"
 #include "IApplication.hpp"
-#include "ApplicationSettings.hpp"
+#include "ConfigVars.hpp"
 
 #include <Helpers/Helpers.hpp>
 
@@ -82,11 +82,6 @@ namespace Win32OS
     {
         return m_hwnd;
     }
-
-    bool Win32System::IsTearingSupport()
-    {
-        m_isTearingSupport;
-    }
     
     bool Win32System::IsFullscreen()
     {
@@ -99,84 +94,6 @@ namespace Win32OS
         height = m_windowHeight;
     }
 
-    bool Win32System::checkTearingSupport()
-    {
-        BOOL allowTearing = FALSE;
-
-        // Rather than create the DXGI 1.5 factory interface directly, we create the
-        // DXGI 1.4 interface and query for the 1.5 interface. This is to enable the 
-        // graphics debugging tools which will not support the 1.5 factory interface 
-        // until a future update.
-        ComPtr<IDXGIFactory4> factory4;
-        if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory4)))) {
-            ComPtr<IDXGIFactory5> factory5;
-            if (SUCCEEDED(factory4.As(&factory5))) {
-                if (FAILED(factory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing)))) {
-                    allowTearing = FALSE;
-                }
-            }
-        }
-
-        return allowTearing == TRUE;
-    }
-
-    bool Win32System::createSwapChain(DescWin32& desc)
-    {
-        m_isTearingSupport = checkTearingSupport();
-
-        ComPtr<IDXGIFactory4> dxgiFactory4;
-        UINT createFactoryFlags = 0;
-
-        if (desc.DX12SubsystemDebug) {
-            createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
-        }
-
-        ThrowIfFailed(CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory4)));
-
-        DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-        swapChainDesc.Width = m_windowWidth;
-        swapChainDesc.Height = m_windowHeight;
-        swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        swapChainDesc.Stereo = FALSE;
-        swapChainDesc.SampleDesc = { 1, 0 };
-        swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        swapChainDesc.BufferCount = NUM_FRAMES;
-        swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
-        swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-        swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-        // It is recommended to always allow tearing if tearing support is available.
-        swapChainDesc.Flags = m_isTearingSupport ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
-
-        ComPtr<IDXGISwapChain1> swapChain1;
-        ThrowIfFailed(dxgiFactory4->CreateSwapChainForHwnd(
-            m_dx12.GetDirectCommandQueue().Get(),
-            m_hwnd,
-            &swapChainDesc,
-            nullptr,
-            nullptr,
-            &swapChain1));
-
-        // Disable the Alt+Enter fullscreen toggle feature. Switching to fullscreen
-        // will be handled manually.
-        ThrowIfFailed(dxgiFactory4->MakeWindowAssociation(m_hwnd, DXGI_MWA_NO_ALT_ENTER));
-
-        ThrowIfFailed(swapChain1.As(&g_SwapChain));
-
-        // Create Descriptor Heap
-        D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-        desc.NumDescriptors = NUM_FRAMES;
-        desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-
-        ThrowIfFailed(g_Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&g_RTVDescriptorHeap)));
-        g_RTVDescriptorSize = g_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-        UpdateRenderTargetViews();
-
-        graphics::WaitForGPU();
-
-        g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
-        return true;
-    }
 
     bool Win32System::createWindow(DescWin32& desc)
     {

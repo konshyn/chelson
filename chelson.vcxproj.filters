@@ -141,8 +141,14 @@
     <ClInclude Include="src\Common\DirectX12\DX12Subsystem.hpp">
       <Filter>Common\DirectX12</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\ApplicationSettings.hpp">
+    <ClInclude Include="src\Common\ConfigVars.hpp">
       <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\DirectX12\SwapChain.hpp">
+      <Filter>Common\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common\DirectX12\RenderTarget.hpp">
+      <Filter>Common\DirectX12</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -217,8 +223,14 @@
     <ClCompile Include="src\Common\DirectX12\DX12Subsystem.cpp">
       <Filter>Common\DirectX12</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\ApplicationSettings.cpp">
+    <ClCompile Include="src\Common\ConfigVars.cpp">
       <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\DirectX12\RenderTarget.cpp">
+      <Filter>Common\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\DirectX12\SwapChain.cpp">
+      <Filter>Common\DirectX12</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
